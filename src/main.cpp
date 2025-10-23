@@ -16,14 +16,14 @@ num_type mod(num_type num_a, num_type num_b) {
 std::vector<num_type> create_shares(num_type plain_num) {
   std::vector<num_type> shares(PARTY_COUNT);
   std::random_device random_generater;
-  num_type remainder_of_plain_num = mod(plain_num, MODULUS);
+  num_type mod_of_plain_num = mod(plain_num, MODULUS);
   num_type mod_of_shares_sum = 0;
   for (int share_i = 0; share_i < PARTY_COUNT; share_i++) {
     if (share_i + 1 == PARTY_COUNT) {
       num_type random_num = random_generater();
       shares[share_i] =
-          random_num + (remainder_of_plain_num -
-                        (mod_of_shares_sum + mod(random_num, MODULUS)));
+          random_num +
+          (mod_of_plain_num - (mod_of_shares_sum + mod(random_num, MODULUS)));
     } else {
       shares[share_i] = random_generater();
       mod_of_shares_sum += mod(mod(shares[share_i], MODULUS), MODULUS);
