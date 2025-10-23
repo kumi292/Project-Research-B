@@ -14,6 +14,8 @@ NumType mod(NumType dividend, NumType divisor) {
 }
 
 SharesType create_shares(NumType plain_num) {
+  if (plain_num >= MODULUS)
+    exit(1);
   SharesType shares(PARTY_COUNT);
   std::random_device random_generater;
   NumType mod_of_plain_num = mod(plain_num, MODULUS);
