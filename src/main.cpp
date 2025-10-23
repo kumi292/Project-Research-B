@@ -28,7 +28,8 @@ SharesType create_shares(NumType plain_num) {
           (mod_of_plain_num - (mod_of_shares_sum + mod(random_num, MODULUS)));
     } else {
       shares[share_i] = random_generater();
-      mod_of_shares_sum += mod(mod(shares[share_i], MODULUS), MODULUS);
+      mod_of_shares_sum =
+          mod(mod_of_shares_sum + mod(shares[share_i], MODULUS), MODULUS);
     }
   }
   return shares;
