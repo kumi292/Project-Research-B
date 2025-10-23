@@ -3,8 +3,8 @@
 #include <vector>
 using NumType = int;
 using SharesType = std::vector<NumType>;
-int PARTY_COUNT = 2;
-int MODULUS = 1 << 25;
+const int PARTY_COUNT = 2;
+const int MODULUS = 1 << 25;
 
 NumType mod(NumType dividend, NumType divisor) {
   if (divisor <= 0)
