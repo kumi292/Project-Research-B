@@ -21,9 +21,9 @@ int main() {
   SharesType shares_alice = {shares_a[0], shares_b[0]};
   SharesType shares_bob = {shares_a[1], shares_b[1]};
   SharesType shares_added = Additive::add({shares_alice, shares_bob});
-  std::cout << "Reconstructed number is "
+  std::cout << "Sum of numbers (using additive secret sharing scheme) is "
             << Additive::reconstruct_from_shares(shares_added) << std::endl;
-  std::cout << "Sum of plain number is " << plain_num_a + plain_num_b
-            << std::endl;
+  std::cout << "Sum of numbers (not using secret sharing scheme) is "
+            << plain_num_a + plain_num_b << std::endl;
   return 0;
 }
