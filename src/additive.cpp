@@ -1,4 +1,5 @@
 #include <random>
+#include <vector>
 
 #include "additive.h"
 #include "consts_and_types.h"
@@ -40,6 +41,15 @@ NumType reconstruct_from_shares(SharesType shares) {
     reconstructed_num = mod(reconstructed_num + mod(share, MODULUS), MODULUS);
   }
   return reconstructed_num;
+}
+
+SharesType add(std::vector<SharesType> parties_with_shares) {
+  SharesType added_shares;
+  for (int i = 0; i < PARTY_COUNT; i++) {
+    added_shares.push_back(parties_with_shares[i][0] +
+                           parties_with_shares[i][1]);
+  }
+  return added_shares;
 }
 
 } // namespace Additive
