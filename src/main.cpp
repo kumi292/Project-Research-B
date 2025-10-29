@@ -3,17 +3,27 @@
 #include "additive.h"
 #include "consts_and_types.h"
 
-int main() {
-  NumType plain_num;
+void set_number_from_stdin(NumType &input_num) {
   do {
     std::cout << "Enter number ( 0 ~ " << MODULUS - 1 << " ): ";
-    std::cin >> plain_num;
-  } while (plain_num >= MODULUS);
-  SharesType shares = Additive::create_shares(plain_num);
-  for (int share_i = 0; share_i < PARTY_COUNT; share_i++) {
-    std::cout << "share_" << share_i << ": " << shares[share_i] << std::endl;
-  }
+    std::cin >> input_num;
+  } while (input_num >= MODULUS);
+}
+
+int main() {
+  NumType plain_num_a, plain_num_b;
+  std::cout << "Alice: ";
+  set_number_from_stdin(plain_num_a);
+  std::cout << "Bob: ";
+  set_number_from_stdin(plain_num_b);
+  SharesType shares_a = Additive::create_shares(plain_num_a);
+  SharesType shares_b = Additive::create_shares(plain_num_b);
+  SharesType shares_alice = {shares_a[0], shares_b[0]};
+  SharesType shares_bob = {shares_a[1], shares_b[1]};
+  SharesType shares_added = Additive::add({shares_alice, shares_bob});
   std::cout << "Reconstructed number is "
-            << Additive::reconstruct_from_shares(shares) << std::endl;
+            << Additive::reconstruct_from_shares(shares_added) << std::endl;
+  std::cout << "Sum of plain number is " << plain_num_a + plain_num_b
+            << std::endl;
   return 0;
 }
