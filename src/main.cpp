@@ -12,9 +12,9 @@ void set_number_from_stdin(NumType &input_num) {
 
 int main() {
   NumType plain_num_a, plain_num_b;
-  std::cout << "Alice: ";
+  std::cout << "Number A: \n";
   set_number_from_stdin(plain_num_a);
-  std::cout << "Bob: ";
+  std::cout << "Number B: \n";
   set_number_from_stdin(plain_num_b);
   SharesType shares_a = Additive::create_shares(plain_num_a);
   SharesType shares_b = Additive::create_shares(plain_num_b);
