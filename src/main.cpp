@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "additive.h"
 #include "consts_and_types.h"
@@ -10,6 +11,11 @@ void set_number_from_stdin(NumType &input_num) {
   } while (input_num >= MODULUS);
 }
 
+std::string create_string_expression(ShareType share) {
+  return "(" + std::to_string(std::get<0>(share)) + ", " +
+         std::to_string(std::get<1>(share)) + ")";
+}
+
 int main() {
   NumType plain_num_a, plain_num_b;
 
@@ -17,71 +23,58 @@ int main() {
   set_number_from_stdin(plain_num_a);
   SharesType shares_a = Additive::create_shares(plain_num_a);
   std::cout << "[Generating Shares...]" << std::endl;
-  std::cout << "Party 1 Share: (" << std::get<0>(shares_a[0]) << ", "
-            << std::get<1>(shares_a[0]) << ")" << std::endl;
-  std::cout << "Party 2 Share: (" << std::get<0>(shares_a[1]) << ", "
-            << std::get<1>(shares_a[1]) << ")" << std::endl;
-  std::cout << "Party 3 Share: (" << std::get<0>(shares_a[2]) << ", "
-            << std::get<1>(shares_a[2]) << ")" << std::endl;
+  std::cout << "Party 1 Share: " << create_string_expression(shares_a[0])
+            << std::endl;
+  std::cout << "Party 2 Share: " << create_string_expression(shares_a[1])
+            << std::endl;
+  std::cout << "Party 3 Share: " << create_string_expression(shares_a[2])
+            << std::endl;
   std::cout << std::endl;
   std::cout << "Number B: \n";
   set_number_from_stdin(plain_num_b);
   SharesType shares_b = Additive::create_shares(plain_num_b);
   std::cout << "[Generating Shares...]" << std::endl;
-  std::cout << "Party 1 Share: (" << std::get<0>(shares_b[0]) << ", "
-            << std::get<1>(shares_b[0]) << ")" << std::endl;
-  std::cout << "Party 2 Share: (" << std::get<0>(shares_b[1]) << ", "
-            << std::get<1>(shares_b[1]) << ")" << std::endl;
-  std::cout << "Party 3 Share: (" << std::get<0>(shares_b[2]) << ", "
-            << std::get<1>(shares_b[2]) << ")" << std::endl;
+  std::cout << "Party 1 Share: " << create_string_expression(shares_b[0])
+            << std::endl;
+  std::cout << "Party 2 Share: " << create_string_expression(shares_b[1])
+            << std::endl;
+  std::cout << "Party 3 Share: " << create_string_expression(shares_b[2])
+            << std::endl;
   std::cout << std::endl;
   SharesType shares_party_1 = {shares_a[0], shares_b[0]};
   SharesType shares_party_2 = {shares_a[1], shares_b[1]};
-  SharesType shares_Party_3 = {shares_a[2], shares_b[2]};
+  SharesType shares_party_3 = {shares_a[2], shares_b[2]};
 
-  std::cout << "Reconstructed Number A: "
-            << Additive::reconstruct_from_shares(shares_party_1[0],
-                                                 shares_Party_3[0])
+  SharesType shares_added =
+      Additive::add({shares_party_1, shares_party_2, shares_party_3});
+  std::cout << "[Addition]" << std::endl;
+  std::cout << "Party 1: " << create_string_expression(shares_party_1[0])
+            << " + " << create_string_expression(shares_party_1[1]) << " = "
+            << create_string_expression(shares_added[0]) << std::endl;
+  std::cout << "Party 2: " << create_string_expression(shares_party_2[0])
+            << " + " << create_string_expression(shares_party_2[1]) << " = "
+            << create_string_expression(shares_added[1]) << std::endl;
+  std::cout << "Party 3: " << create_string_expression(shares_party_3[0])
+            << " + " << create_string_expression(shares_party_3[1]) << " = "
+            << create_string_expression(shares_added[2]) << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "[Reconstruction]" << std::endl;
+  std::cout << "Reconst(Party 1, Party 2): "
+            << Additive::reconstruct_from_shares(shares_added[0],
+                                                 shares_added[1])
             << std::endl;
-  std::cout << "Reconstructed Number B: "
-            << Additive::reconstruct_from_shares(shares_party_2[1],
-                                                 shares_party_1[1])
+  std::cout << "Reconst(Party 1, Party 3): "
+            << Additive::reconstruct_from_shares(shares_added[0],
+                                                 shares_added[2])
             << std::endl;
-
-  // SharesType shares_added = Additive::add({shares_party_1,
-  // shares_party_2});
-  //  SharesType shares_multiplied =
-  //      Additive::multiply({shares_party_1, shares_party_2});
-  // std::cout << "[Local Addition]" << std::endl;
-  // std::cout << "Party 1: " << shares_party_1[0] << " + " <<
-  // shares_party_1[1]
-  //          << " = " << shares_added[0] << std::endl;
-  // std::cout << "Party 2: " << shares_party_2[0] << " + " <<
-  // shares_party_2[1]
-  //          << " = " << shares_added[1] << std::endl;
-  // std::cout << std::endl;
-  // std::cout << "[Local Multiplication]" << std::endl;
-  // std::cout << "Party 1: " << shares_party_1[0] << " * " <<
-  // shares_party_1[1]
-  //          << " = " << shares_multiplied[0] << std::endl;
-  // std::cout << "Party 2: " << shares_party_2[0] << " * " <<
-  // shares_party_2[1]
-  //          << " = " << shares_multiplied[1] << std::endl;
-  // std::cout << std::endl;
-
-  // std::cout << "Sum of numbers (using additive secret sharing scheme) is
-  // "
-  //           << Additive::reconstruct_from_shares(shares_added) <<
-  //           std::endl;
-  // std::cout << "Sum of numbers (not using secret sharing scheme) is "
-  //           << plain_num_a + plain_num_b << std::endl;
-  // std::cout << "Product of numbers (using additive secret sharing scheme)
-  // is
-  // "
-  //           << Additive::reconstruct_from_shares(shares_multiplied)
-  //           << std::endl;
-  // std::cout << "Product of numbers (not using secret sharing scheme) is "
-  //           << plain_num_a * plain_num_b << std::endl;
+  std::cout << "Reconst(Party 2, Party 3): "
+            << Additive::reconstruct_from_shares(shares_added[1],
+                                                 shares_added[2])
+            << std::endl;
+  std::cout << std::endl;
+  std::cout << "Sum of Plain Numbers: " << plain_num_a + plain_num_b
+            << std::endl;
 
   return 0;
 }
