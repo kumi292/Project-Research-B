@@ -72,8 +72,35 @@ int main() {
             << Additive::reconstruct_from_shares(shares_added[1],
                                                  shares_added[2])
             << std::endl;
-  std::cout << std::endl;
   std::cout << "Sum of Plain Numbers: " << plain_num_a + plain_num_b
+            << std::endl;
+  std::cout << std::endl;
+
+  SharesType shares_multiplied =
+      Additive::multiply({shares_party_1, shares_party_2, shares_party_3});
+  std::cout << "[Multiplication]" << std::endl;
+  std::cout << "Party 1: " << create_string_expression(shares_multiplied[0])
+            << std::endl;
+  std::cout << "Party 2: " << create_string_expression(shares_multiplied[1])
+            << std::endl;
+  std::cout << "Party 3: " << create_string_expression(shares_multiplied[2])
+            << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "[Reconstruction]" << std::endl;
+  std::cout << "Reconst(Party 1, Party 2): "
+            << Additive::reconstruct_from_shares(shares_multiplied[0],
+                                                 shares_multiplied[1])
+            << std::endl;
+  std::cout << "Reconst(Party 1, Party 3): "
+            << Additive::reconstruct_from_shares(shares_multiplied[0],
+                                                 shares_multiplied[2])
+            << std::endl;
+  std::cout << "Reconst(Party 2, Party 3): "
+            << Additive::reconstruct_from_shares(shares_multiplied[1],
+                                                 shares_multiplied[2])
+            << std::endl;
+  std::cout << "Product of Plain Numbers: " << plain_num_a * plain_num_b
             << std::endl;
 
   return 0;
