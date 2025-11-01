@@ -1,7 +1,10 @@
+#include "additive.h"
+
+#include <numeric>
 #include <random>
+#include <set>
 #include <vector>
 
-#include "additive.h"
 #include "consts_and_types.h"
 
 NumType mod(NumType dividend, NumType divisor) {
@@ -23,33 +26,45 @@ SharesType create_shares(NumType plain_num) {
   for (int share_i = 0; share_i < PARTY_COUNT; share_i++) {
     if (share_i + 1 == PARTY_COUNT) {
       NumType random_num = random_generater();
-      shares[share_i] =
+      std::get<0>(shares[share_i]) =
           random_num +
           (mod_of_plain_num - (mod_of_shares_sum + mod(random_num, MODULUS)));
+      std::get<1>(shares[mod(share_i + 1, PARTY_COUNT)]) =
+          std::get<0>(shares[share_i]);
     } else {
-      shares[share_i] = random_generater();
+      std::get<0>(shares[share_i]) = random_generater();
+      std::get<1>(shares[mod(share_i + 1, PARTY_COUNT)]) =
+          std::get<0>(shares[share_i]);
       mod_of_shares_sum =
-          mod(mod_of_shares_sum + mod(shares[share_i], MODULUS), MODULUS);
+          mod(mod_of_shares_sum + mod(std::get<0>(shares[share_i]), MODULUS),
+              MODULUS);
     }
   }
   return shares;
 }
 
-NumType reconstruct_from_shares(SharesType shares) {
-  NumType reconstructed_num = 0;
-  for (auto share : shares) {
-    reconstructed_num = mod(reconstructed_num + mod(share, MODULUS), MODULUS);
-  }
-  return reconstructed_num;
+NumType reconstruct_from_shares(ShareType share_1, ShareType share_2) {
+  std::set<NumType> shares = {std::get<0>(share_1), std::get<1>(share_1),
+                              std::get<0>(share_2), std::get<1>(share_2)};
+  return mod(std::reduce(shares.begin(), shares.end()), MODULUS);
 }
 
-SharesType add(std::vector<SharesType> parties_with_shares) {
-  SharesType added_shares;
-  for (int i = 0; i < PARTY_COUNT; i++) {
-    added_shares.push_back(parties_with_shares[i][0] +
-                           parties_with_shares[i][1]);
-  }
-  return added_shares;
-}
+// SharesType add(std::vector<SharesType> parties_with_shares) {
+//   SharesType added_shares;
+//   for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
+//     added_shares.push_back(parties_with_shares[party_i][0] +
+//                            parties_with_shares[party_i][1]);
+//   }
+//   return added_shares;
+// }
+//
+// SharesType multiply(std::vector<SharesType> parties_with_shares) {
+//   SharesType multiplied_shares;
+//   for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
+//     multiplied_shares.push_back(parties_with_shares[party_i][0] *
+//                                 parties_with_shares[party_i][1]);
+//   }
+//   return multiplied_shares;
+// }
 
 } // namespace Additive
