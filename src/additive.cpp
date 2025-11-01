@@ -49,22 +49,15 @@ NumType reconstruct_from_shares(ShareType share_1, ShareType share_2) {
   return mod(std::reduce(shares.begin(), shares.end()), MODULUS);
 }
 
-// SharesType add(std::vector<SharesType> parties_with_shares) {
-//   SharesType added_shares;
-//   for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
-//     added_shares.push_back(parties_with_shares[party_i][0] +
-//                            parties_with_shares[party_i][1]);
-//   }
-//   return added_shares;
-// }
-//
-// SharesType multiply(std::vector<SharesType> parties_with_shares) {
-//   SharesType multiplied_shares;
-//   for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
-//     multiplied_shares.push_back(parties_with_shares[party_i][0] *
-//                                 parties_with_shares[party_i][1]);
-//   }
-//   return multiplied_shares;
-// }
+SharesType add(std::vector<SharesType> parties_with_shares) {
+  SharesType added_shares;
+  for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
+    added_shares.push_back({(std::get<0>(parties_with_shares[party_i][0]) +
+                             std::get<0>(parties_with_shares[party_i][1])),
+                            (std::get<1>(parties_with_shares[party_i][0]) +
+                             std::get<1>(parties_with_shares[party_i][1]))});
+  }
+  return added_shares;
+}
 
 } // namespace Additive
