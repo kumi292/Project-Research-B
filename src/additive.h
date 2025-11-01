@@ -14,4 +14,6 @@ NumType reconstruct_from_shares(SharesType shares);
 
 SharesType add(std::vector<SharesType> parties_with_shares);
 
+SharesType multiply(std::vector<SharesType> parties_with_shares);
+
 } // namespace Additive
