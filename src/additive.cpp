@@ -60,4 +60,21 @@ SharesType add(std::vector<SharesType> parties_with_shares) {
   return added_shares;
 }
 
+SharesType multiply(std::vector<SharesType> parties_with_shares) {
+  SharesType multiplied_shares(PARTY_COUNT);
+  for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
+    NumType one_of_new_share =
+        std::get<0>(parties_with_shares[party_i][0]) *
+            std::get<0>(parties_with_shares[party_i][1]) +
+        std::get<0>(parties_with_shares[party_i][0]) *
+            std::get<1>(parties_with_shares[party_i][1]) +
+        std::get<1>(parties_with_shares[party_i][0]) *
+            std::get<0>(parties_with_shares[party_i][1]);
+    std::get<0>(multiplied_shares[party_i]) = one_of_new_share;
+    std::get<1>(multiplied_shares[mod(party_i + 1, PARTY_COUNT)]) =
+        one_of_new_share;
+  }
+  return multiplied_shares;
+}
+
 } // namespace Additive
