@@ -20,19 +20,21 @@ SharesType create_shares(NumType plain_num) {
   if (plain_num >= MODULUS)
     exit(1);
   SharesType shares(PARTY_COUNT);
-  std::random_device random_generater;
+  std::random_device seed_gen;
+  std::mt19937 engine(seed_gen());
+  std::uniform_int_distribution<NumType> dist(-RANDOM_MAX, RANDOM_MAX);
   NumType mod_of_plain_num = mod(plain_num, MODULUS);
   NumType mod_of_shares_sum = 0;
   for (int share_i = 0; share_i < PARTY_COUNT; share_i++) {
     if (share_i + 1 == PARTY_COUNT) {
-      NumType random_num = random_generater();
+      NumType random_num = dist(engine);
       std::get<0>(shares[share_i]) =
           random_num +
           (mod_of_plain_num - (mod_of_shares_sum + mod(random_num, MODULUS)));
       std::get<1>(shares[mod(share_i + 1, PARTY_COUNT)]) =
           std::get<0>(shares[share_i]);
     } else {
-      std::get<0>(shares[share_i]) = random_generater();
+      std::get<0>(shares[share_i]) = dist(engine);
       std::get<1>(shares[mod(share_i + 1, PARTY_COUNT)]) =
           std::get<0>(shares[share_i]);
       mod_of_shares_sum =
