@@ -22,7 +22,7 @@ SharesType create_shares(NumType plain_num) {
   SharesType shares(PARTY_COUNT);
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
-  std::uniform_int_distribution<NumType> dist(-RANDOM_MAX, RANDOM_MAX);
+  std::uniform_int_distribution<NumType> dist(0, RANDOM_MAX);
   NumType mod_of_plain_num = mod(plain_num, MODULUS);
   NumType mod_of_shares_sum = 0;
   for (int share_i = 0; share_i < PARTY_COUNT; share_i++) {
