@@ -1,7 +1,7 @@
 #include <random>
 #include <vector>
 
-#include "additive.h"
+#include "beaver_triple.h"
 #include "consts_and_types.h"
 
 NumType mod(NumType dividend, NumType divisor) {
@@ -11,7 +11,7 @@ NumType mod(NumType dividend, NumType divisor) {
                        : (dividend % divisor + divisor) % divisor;
 }
 
-namespace Additive {
+namespace BT {
 
 SharesType create_shares(NumType plain_num) {
   if (plain_num >= MODULUS)
@@ -52,4 +52,4 @@ SharesType add(std::vector<SharesType> parties_with_shares) {
   return added_shares;
 }
 
-} // namespace Additive
+} // namespace BT
