@@ -1,4 +1,4 @@
-#include "additive.h"
+#include "replicated.h"
 
 #include <numeric>
 #include <random>
@@ -14,7 +14,7 @@ NumType mod(NumType dividend, NumType divisor) {
                        : (dividend % divisor + divisor) % divisor;
 }
 
-namespace Additive {
+namespace Replicated {
 
 SharesType create_shares(NumType plain_num) {
   if (plain_num >= MODULUS)
@@ -79,4 +79,4 @@ SharesType multiply(std::vector<SharesType> parties_with_shares) {
   return multiplied_shares;
 }
 
-} // namespace Additive
+} // namespace Replicated
