@@ -46,9 +46,9 @@ NumType reconstruct_from_shares(SharesType shares) {
 
 SharesType add(std::vector<SharesType> parties_with_shares) {
   SharesType added_shares;
-  for (int i = 0; i < PARTY_COUNT; i++) {
-    added_shares.push_back(parties_with_shares[i][0] +
-                           parties_with_shares[i][1]);
+  for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
+    added_shares.push_back(parties_with_shares[party_i][0] +
+                           parties_with_shares[party_i][1]);
   }
   return added_shares;
 }
