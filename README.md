@@ -9,7 +9,7 @@
 ```
 chmod +x compile_and_execute.sh
 ```
-- 機能functionのテストをしたい場合：
+- 機能functionのテストをしたい場合
 ```
 ./compile_and_execute.sh function
 ```
