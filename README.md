@@ -5,23 +5,11 @@
 
 ## 実行方法
 プロジェクトのルートディレクトリで作業してください。
-
-### main関数の実行方法
-- コンパイル
+- シェルスクリプトの実行権限付与
 ```
-clang++ -std=c++17 -Iinclude src/*.cpp -o bin/main
+chmod +x compile_and_execute.sh
 ```
-- 実行
+- 機能functionのテストをしたい場合：
 ```
-bin/main
-```
-
-### 機能ごとのテストの実行方法
-- コンパイル
-```
-clang++ -std=c++17 -Iinclude {tests/test_,src/}function.cpp -o bin/function
-```
-- 実行
-```
-bin/function
+./compile_and_execute.sh function
 ```
