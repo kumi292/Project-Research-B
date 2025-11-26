@@ -2,7 +2,6 @@
 #include <vector>
 
 #include "beaver_triple.h"
-#include "consts_and_types.h"
 
 NumType mod(NumType dividend, NumType divisor) {
   if (divisor <= 0)
