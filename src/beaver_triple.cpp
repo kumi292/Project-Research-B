@@ -66,7 +66,7 @@ SharesType multiply(std::vector<SharesType> parties_with_shares) {
   SharesType triple_c_shares = create_shares(triple_a * triple_b);
 
   SharesType sigma_shares, rho_shares;
-  for (int party_i; party_i < PARTY_COUNT; party_i++) {
+  for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
     sigma_shares.push_back(parties_with_shares[party_i][0] -
                            triple_a_shares[party_i]);
     rho_shares.push_back(parties_with_shares[party_i][1] -

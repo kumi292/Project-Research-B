@@ -31,7 +31,7 @@ int main() {
   SharesType shares_party_2 = {shares_a[1], shares_b[1]};
 
   SharesType shares_added = BT::add({shares_party_1, shares_party_2});
-  std::cout << "[Local Addition]" << std::endl;
+  std::cout << "[Addition]" << std::endl;
   std::cout << "Party 1: " << shares_party_1[0] << " + " << shares_party_1[1]
             << " = " << shares_added[0] << std::endl;
   std::cout << "Party 2: " << shares_party_2[0] << " + " << shares_party_2[1]
