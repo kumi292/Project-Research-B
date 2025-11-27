@@ -5,8 +5,6 @@
 #include <set>
 #include <vector>
 
-#include "consts_and_types.h"
-
 NumType mod(NumType dividend, NumType divisor) {
   if (divisor <= 0)
     exit(1);

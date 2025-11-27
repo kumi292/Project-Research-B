@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 
-#include "consts_and_types.h"
 #include "replicated.h"
 
 void set_number_from_stdin(NumType &input_num) {
