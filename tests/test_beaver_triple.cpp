@@ -56,6 +56,46 @@ int test_addition_and_multiplication() {
   exit(0);
 }
 
+int test_inner_product() {
+  int vec_size;
+  std::cout << "Vector size: ";
+  std::cin >> vec_size;
+  std::vector<NumType> vector_a(vec_size), vector_b(vec_size);
+  std::cout << "Enter Vectors (use space for separator)\n";
+  std::cout << "Vector A: \n";
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    set_number_from_stdin(vector_a[component_i], component_i);
+  }
+  std::cout << "Vector B: \n";
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    set_number_from_stdin(vector_b[component_i], component_i);
+  }
+  std::cout << std::endl;
+
+  std::vector<SharesType> party1_shares(vec_size), party2_shares(vec_size);
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    SharesType veca_componenti_shares =
+        BT::create_shares(vector_a[component_i]);
+    SharesType vecb_componenti_shares =
+        BT::create_shares(vector_b[component_i]);
+    party1_shares[0].push_back(veca_componenti_shares[0]);
+    party1_shares[1].push_back(vecb_componenti_shares[0]);
+    party2_shares[0].push_back(veca_componenti_shares[1]);
+    party2_shares[1].push_back(vecb_componenti_shares[1]);
+  }
+
+  std::cout << "[Inner Product]" << std::endl;
+  SharesType shares_inner_product =
+      BT::inner_product(party1_shares, party2_shares);
+  std::cout << "Inner Product of vectors (using secret sharing) is "
+            << BT::reconstruct_from_shares(shares_inner_product) << std::endl;
+  std::cout << "Inner Product of vectors (not using secret sharing) is "
+            << std::inner_product(vector_a.begin(), vector_a.end(),
+                                  vector_b.begin(), 0LL)
+            << std::endl;
+  exit(0);
+}
+
 int main() {
   std::cout << "Which one to test\n"
                "a: addition and multiplication\n"
