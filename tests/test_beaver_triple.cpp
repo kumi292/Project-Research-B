@@ -104,11 +104,13 @@ int main() {
   while (true) {
     std::cout << "Enter alphabet: ";
     std::cin >> inputted_char;
-    if (inputted_char == "a")
+    if (inputted_char == "a") {
+      std::cout << std::endl;
       test_addition_and_multiplication();
-    else if (inputted_char == "b")
+    } else if (inputted_char == "b") {
+      std::cout << std::endl;
       test_inner_product();
-    else {
+    } else {
       std::cout << "Sorry, try again\n";
     }
   }
