@@ -13,7 +13,7 @@ void set_number_from_stdin(NumType &input_num, int repetition = 0) {
   } while (input_num >= MODULUS);
 }
 
-int main() {
+int test_addition_and_multiplication() {
   NumType plain_num_a, plain_num_b;
   std::cout << "Number A: \n";
   set_number_from_stdin(plain_num_a);
@@ -53,6 +53,23 @@ int main() {
             << BT::reconstruct_from_shares(shares_multiplied) << std::endl;
   std::cout << "Product of numbers (not using secret sharing scheme) is "
             << plain_num_a * plain_num_b << std::endl;
+  exit(0);
+}
 
-  return 0;
+int main() {
+  std::cout << "Which one to test\n"
+               "a: addition and multiplication\n"
+               "b: inner_product\n";
+  std::string inputted_char;
+  while (true) {
+    std::cout << "Enter alphabet: ";
+    std::cin >> inputted_char;
+    if (inputted_char == "a")
+      test_addition_and_multiplication();
+    else if (inputted_char == "b")
+      test_inner_product();
+    else {
+      std::cout << "Sorry, try again\n";
+    }
+  }
 }
