@@ -1,4 +1,7 @@
 #include <iostream>
+#include <numeric>
+#include <string>
+#include <vector>
 
 #include "beaver_triple.h"
 
