@@ -84,9 +84,11 @@ int test_inner_product() {
     party2_shares[1].push_back(vecb_componenti_shares[1]);
   }
 
-  std::cout << "[Inner Product]" << std::endl;
   SharesType shares_inner_product =
       BT::inner_product(party1_shares, party2_shares);
+  std::cout << "[Inner Product]" << std::endl;
+  std::cout << "calculated shares: {" << shares_inner_product[0] << ", "
+            << shares_inner_product[1] << "}\n";
   std::cout << "Inner Product of vectors (using secret sharing) is "
             << BT::reconstruct_from_shares(shares_inner_product) << std::endl;
   std::cout << "Inner Product of vectors (not using secret sharing) is "
