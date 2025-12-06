@@ -2,9 +2,10 @@
 
 #include "beaver_triple.h"
 
-void set_number_from_stdin(NumType &input_num) {
+void set_number_from_stdin(NumType &input_num, int repetition = 0) {
   do {
-    std::cout << "Enter number ( 0 ~ " << MODULUS - 1 << " ): ";
+    if (repetition == 0)
+      std::cout << "Enter number ( 0 ~ " << MODULUS - 1 << " ): ";
     std::cin >> input_num;
   } while (input_num >= MODULUS);
 }
