@@ -99,7 +99,7 @@ int test_inner_product() {
 int main() {
   std::cout << "Which one to test\n"
                "a: addition and multiplication\n"
-               "b: inner_product\n";
+               "b: inner product\n";
   std::string inputted_char;
   while (true) {
     std::cout << "Enter alphabet: ";
