@@ -153,6 +153,8 @@ int test_inner_product() {
             << std::inner_product(vector_a.begin(), vector_a.end(),
                                   vector_b.begin(), 0LL)
             << std::endl;
+  std::cout << "Communication Cost: " << Replicated::communication_cost
+            << std::endl;
   exit(0);
 }
 
