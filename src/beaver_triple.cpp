@@ -62,15 +62,20 @@ SharesType multiply(std::vector<SharesType> parties_with_shares) {
   NumType triple_a = dist(engine);
   NumType triple_b = dist(engine);
   SharesType triple_a_shares = create_shares(triple_a);
+  communication_cost += 2;
   SharesType triple_b_shares = create_shares(triple_b);
+  communication_cost += 2;
   SharesType triple_c_shares = create_shares(triple_a * triple_b);
+  communication_cost += 2;
 
   SharesType sigma_shares, rho_shares;
   for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
     sigma_shares.push_back(parties_with_shares[party_i][0] -
                            triple_a_shares[party_i]);
+    communication_cost++;
     rho_shares.push_back(parties_with_shares[party_i][1] -
                          triple_b_shares[party_i]);
+    communication_cost++;
   }
   NumType sigma = reconstruct_from_shares(sigma_shares);
   NumType rho = reconstruct_from_shares(rho_shares);

@@ -13,6 +13,7 @@ NumType mod(NumType dividend, NumType divisor);
 
 namespace BT {
 
+inline int communication_cost = 0;
 SharesType create_shares(NumType plain_num);
 NumType reconstruct_from_shares(SharesType shares);
 SharesType add(std::vector<SharesType> parties_with_shares);
