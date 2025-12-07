@@ -106,7 +106,8 @@ SharesType inner_product(std::vector<SharesType> party1_shares,
   SharesType calculated_shares = {0, 0};
   for (int component_i = 0; component_i < vec_size; component_i++) {
     calculated_shares =
-        add({calculated_shares, multiplied_shares_vec[component_i]});
+        add({{calculated_shares[0], multiplied_shares_vec[component_i][0]},
+             {calculated_shares[1], multiplied_shares_vec[component_i][1]}});
   }
 
   return calculated_shares;
