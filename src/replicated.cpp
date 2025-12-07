@@ -77,4 +77,27 @@ SharesType multiply(std::vector<SharesType> parties_with_shares) {
   return multiplied_shares;
 }
 
+SharesType inner_product(std::vector<SharesType> party1_shares,
+                         std::vector<SharesType> party2_shares,
+                         std::vector<SharesType> party3_shares) {
+  int vec_size = party1_shares[0].size();
+  std::vector<SharesType> multiplied_shares_vec;
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    multiplied_shares_vec.push_back(multiply(
+        {{party1_shares[0][component_i], party1_shares[1][component_i]},
+         {party2_shares[0][component_i], party2_shares[1][component_i]},
+         {party3_shares[0][component_i], party3_shares[1][component_i]}}));
+  }
+
+  SharesType calculated_shares = {{0, 0}, {0, 0}, {0, 0}};
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    calculated_shares =
+        add({{calculated_shares[0], multiplied_shares_vec[component_i][0]},
+             {calculated_shares[1], multiplied_shares_vec[component_i][1]},
+             {calculated_shares[2], multiplied_shares_vec[component_i][2]}});
+  }
+
+  return calculated_shares;
+}
+
 } // namespace Replicated
