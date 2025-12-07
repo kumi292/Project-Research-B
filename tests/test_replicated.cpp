@@ -1,11 +1,13 @@
 #include <iostream>
+#include <numeric>
 #include <string>
 
 #include "replicated.h"
 
-void set_number_from_stdin(NumType &input_num) {
+void set_number_from_stdin(NumType &input_num, int repetition = 0) {
   do {
-    std::cout << "Enter number ( 0 ~ " << MODULUS - 1 << " ): ";
+    if (repetition == 0)
+      std::cout << "Enter number ( 0 ~ " << MODULUS - 1 << " ): ";
     std::cin >> input_num;
   } while (input_num >= MODULUS);
 }
@@ -15,7 +17,7 @@ std::string create_string_expression(ShareType share) {
          std::to_string(std::get<1>(share)) + ")";
 }
 
-int main() {
+int test_addition_and_multiplication(void) {
   NumType plain_num_a, plain_num_b;
 
   std::cout << "Number A: \n";
@@ -102,5 +104,74 @@ int main() {
   std::cout << "Product of Plain Numbers: " << plain_num_a * plain_num_b
             << std::endl;
 
-  return 0;
+  exit(0);
+}
+
+int test_inner_product() {
+  int vec_size;
+  std::cout << "Vector size: ";
+  std::cin >> vec_size;
+  std::vector<NumType> vector_a(vec_size), vector_b(vec_size);
+  std::cout << "Enter Vectors (use space for separator)\n";
+  std::cout << "Vector A: \n";
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    set_number_from_stdin(vector_a[component_i], component_i);
+  }
+  std::cout << "Vector B: \n";
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    set_number_from_stdin(vector_b[component_i], component_i);
+  }
+  std::cout << std::endl;
+
+  std::vector<SharesType> party1_shares(vec_size), party2_shares(vec_size),
+      party3_shares(vec_size);
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    SharesType veca_componenti_shares =
+        Replicated::create_shares(vector_a[component_i]);
+    SharesType vecb_componenti_shares =
+        Replicated::create_shares(vector_b[component_i]);
+    party1_shares[0].push_back(veca_componenti_shares[0]);
+    party1_shares[1].push_back(vecb_componenti_shares[0]);
+    party2_shares[0].push_back(veca_componenti_shares[1]);
+    party2_shares[1].push_back(vecb_componenti_shares[1]);
+    party3_shares[0].push_back(veca_componenti_shares[2]);
+    party3_shares[1].push_back(vecb_componenti_shares[2]);
+  }
+
+  SharesType shares_inner_product =
+      Replicated::inner_product(party1_shares, party2_shares, party3_shares);
+  std::cout << "[Inner Product]" << std::endl;
+  std::cout << "calculated shares: {"
+            << create_string_expression(shares_inner_product[0]) << ", "
+            << create_string_expression(shares_inner_product[1]) << ", "
+            << create_string_expression(shares_inner_product[2]) << "}\n";
+  std::cout << "Inner Product of vectors (using secret sharing) is "
+            << Replicated::reconstruct_from_shares(shares_inner_product[0],
+                                                   shares_inner_product[1])
+            << std::endl;
+  std::cout << "Inner Product of vectors (not using secret sharing) is "
+            << std::inner_product(vector_a.begin(), vector_a.end(),
+                                  vector_b.begin(), 0LL)
+            << std::endl;
+  exit(0);
+}
+
+int main() {
+  std::cout << "Which one to test\n"
+               "a: addition and multiplication\n"
+               "b: inner product\n";
+  std::string inputted_char;
+  while (true) {
+    std::cout << "Enter alphabet: ";
+    std::cin >> inputted_char;
+    if (inputted_char == "a") {
+      std::cout << std::endl;
+      test_addition_and_multiplication();
+    } else if (inputted_char == "b") {
+      std::cout << std::endl;
+      test_inner_product();
+    } else {
+      std::cout << "Sorry, try again\n";
+    }
+  }
 }
