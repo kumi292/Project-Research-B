@@ -1,14 +1,7 @@
 #include <random>
 #include <vector>
 
-#include "beaver_triple.h"
-
-NumType mod(NumType dividend, NumType divisor) {
-  if (divisor <= 0)
-    exit(1);
-  return dividend >= 0 ? dividend % divisor
-                       : (dividend % divisor + divisor) % divisor;
-}
+#include "common_functions.h"
 
 namespace BT {
 
