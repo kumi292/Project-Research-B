@@ -64,6 +64,7 @@ SharesType multiply(std::vector<SharesType> parties_with_shares) {
   SharesType triple_a_shares = create_shares(triple_a);
   SharesType triple_b_shares = create_shares(triple_b);
   SharesType triple_c_shares = create_shares(triple_a * triple_b);
+  communication_cost += 2;
 
   SharesType sigma_shares, rho_shares;
   for (int party_i = 0; party_i < PARTY_COUNT; party_i++) {
@@ -71,6 +72,7 @@ SharesType multiply(std::vector<SharesType> parties_with_shares) {
                            triple_a_shares[party_i]);
     rho_shares.push_back(parties_with_shares[party_i][1] -
                          triple_b_shares[party_i]);
+    communication_cost++;
   }
   NumType sigma = reconstruct_from_shares(sigma_shares);
   NumType rho = reconstruct_from_shares(rho_shares);
@@ -89,6 +91,28 @@ SharesType multiply(std::vector<SharesType> parties_with_shares) {
   }
 
   return multiplied_shares;
+}
+
+// { {veca_component1_sharei, veca_component2_sharei,...},
+// {vecb_component1_sharei, vecb_component2_sharei,...} }
+SharesType inner_product(std::vector<SharesType> party1_shares,
+                         std::vector<SharesType> party2_shares) {
+  int vec_size = party1_shares[0].size();
+  std::vector<SharesType> multiplied_shares_vec;
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    multiplied_shares_vec.push_back(multiply(
+        {{party1_shares[0][component_i], party1_shares[1][component_i]},
+         {party2_shares[0][component_i], party2_shares[1][component_i]}}));
+  }
+
+  SharesType calculated_shares = {0, 0};
+  for (int component_i = 0; component_i < vec_size; component_i++) {
+    calculated_shares =
+        add({{calculated_shares[0], multiplied_shares_vec[component_i][0]},
+             {calculated_shares[1], multiplied_shares_vec[component_i][1]}});
+  }
+
+  return calculated_shares;
 }
 
 } // namespace BT

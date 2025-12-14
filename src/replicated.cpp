@@ -73,8 +73,36 @@ SharesType multiply(std::vector<SharesType> parties_with_shares) {
     std::get<0>(multiplied_shares[party_i]) = one_of_new_share;
     std::get<1>(multiplied_shares[mod(party_i + 1, PARTY_COUNT)]) =
         one_of_new_share;
+    communication_cost++;
   }
   return multiplied_shares;
+}
+
+SharesType inner_product(std::vector<SharesType> party1_shares,
+                         std::vector<SharesType> party2_shares,
+                         std::vector<SharesType> party3_shares) {
+  int vec_size = party1_shares[0].size();
+  SharesType calculated_shares = {{0, 0}, {0, 0}, {0, 0}};
+  int party_i = 0;
+  for (auto party_shares : {party1_shares, party2_shares, party3_shares}) {
+    NumType one_of_calclulated_share = 0LL;
+    for (int component_i = 0; component_i < vec_size; component_i++) {
+      NumType multiplied_value = std::get<0>(party_shares[0][component_i]) *
+                                     std::get<0>(party_shares[1][component_i]) +
+                                 std::get<0>(party_shares[0][component_i]) *
+                                     std::get<1>(party_shares[1][component_i]) +
+                                 std::get<1>(party_shares[0][component_i]) *
+                                     std::get<0>(party_shares[1][component_i]);
+      one_of_calclulated_share = one_of_calclulated_share + multiplied_value;
+    }
+    std::get<0>(calculated_shares[party_i]) = one_of_calclulated_share;
+    std::get<1>(calculated_shares[mod(party_i + 1, PARTY_COUNT)]) =
+        one_of_calclulated_share;
+    communication_cost++;
+    party_i++;
+  }
+
+  return calculated_shares;
 }
 
 } // namespace Replicated
