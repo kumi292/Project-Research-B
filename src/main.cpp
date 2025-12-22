@@ -37,7 +37,6 @@ int execute_query(int id_to_select) {
   share_of_result_from_server_b =
       std::inner_product(database.begin(), database.end(),
                          search_vector_share_for_server_b.begin(), 0LL);
-
   share_b = share_of_result_from_server_b;
   int query_result = BT::reconstruct_from_shares(
       {share_of_result_from_server_a, share_of_result_from_server_b});
