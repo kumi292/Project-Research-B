@@ -2,14 +2,13 @@
 
 #include <vector>
 
-using NumType = long long;
+#include "common_functions.h"
+
 using SharesType = std::vector<NumType>;
 constexpr int PARTY_COUNT = 2;
 constexpr NumType MODULUS = 1LL << 28;
 constexpr NumType RANDOM_MAX = 1LL << 29;
 constexpr NumType TRIPLE_MAX = 1LL << 13;
-
-NumType mod(NumType dividend, NumType divisor);
 
 namespace BT {
 

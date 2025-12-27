@@ -3,20 +3,17 @@
 #include <numeric>
 #include <random>
 #include <set>
+#include <stdexcept>
 #include <vector>
 
-NumType mod(NumType dividend, NumType divisor) {
-  if (divisor <= 0)
-    exit(1);
-  return dividend >= 0 ? dividend % divisor
-                       : (dividend % divisor + divisor) % divisor;
-}
+#include "common_functions.h"
 
 namespace Replicated {
 
 SharesType create_shares(NumType plain_num) {
   if (plain_num >= MODULUS)
-    exit(1);
+    throw std::invalid_argument(
+        "create_shares: input number must be positive\n");
   SharesType shares(PARTY_COUNT);
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
