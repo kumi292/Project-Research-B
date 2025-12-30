@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
   // 引数1 → SERVER 1として起動
   // 引数2 → SERVER 2として起動
   if (argc != 2 || (strcmp(argv[1], "1") * strcmp(argv[1], "2")) != 0) {
-    std::cout << RED << "Unvalid Booting Option" << std::endl;
+    std::cout << RED << "Invalid Booting Option" << std::endl;
     return 1;
   }
   if (strcmp(argv[1], "1") == 0) {
