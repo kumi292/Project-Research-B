@@ -1,5 +1,6 @@
 #include "json.hpp"
 #include "zmq.hpp"
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <string>
@@ -10,27 +11,24 @@
 using json = nlohmann::json;
 int communication_count = 0;
 
-std::pair<json, json> generate_beaver_triple(int db_size) {
+std::pair<json, json> generate_beaver_triple() {
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
   std::uniform_int_distribution<NumType> dist(0, TRIPLE_MAX);
   json triple_1, triple_2;
 
-  // db_size分beaver tripleを生成
-  for (int i = 0; i < db_size; i++) {
-    NumType triple_a = dist(engine);
-    NumType triple_b = dist(engine);
-    SharesType triple_a_shares = BT::create_shares(triple_a);
-    SharesType triple_b_shares = BT::create_shares(triple_b);
-    SharesType triple_c_shares = BT::create_shares(triple_a * triple_b);
+  NumType triple_a = dist(engine);
+  NumType triple_b = dist(engine);
+  SharesType triple_a_shares = BT::create_shares(triple_a);
+  SharesType triple_b_shares = BT::create_shares(triple_b);
+  SharesType triple_c_shares = BT::create_shares(triple_a * triple_b);
 
-    triple_1["triple_a"].push_back(triple_a_shares[0]);
-    triple_2["triple_a"].push_back(triple_a_shares[1]);
-    triple_1["triple_b"].push_back(triple_b_shares[0]);
-    triple_2["triple_b"].push_back(triple_b_shares[1]);
-    triple_1["triple_c"].push_back(triple_c_shares[0]);
-    triple_2["triple_c"].push_back(triple_c_shares[1]);
-  }
+  triple_1["triple_a"] = (triple_a_shares[0]);
+  triple_2["triple_a"] = (triple_a_shares[1]);
+  triple_1["triple_b"] = (triple_b_shares[0]);
+  triple_2["triple_b"] = (triple_b_shares[1]);
+  triple_1["triple_c"] = (triple_c_shares[0]);
+  triple_2["triple_c"] = (triple_c_shares[1]);
   return {triple_1, triple_2};
 }
 
@@ -51,45 +49,61 @@ int main() {
   std::cout << "Listening on tcp://*:" + PORT + "..." << std::endl;
 
   while (true) {
-    zmq::message_t identity;
-    zmq::message_t payload;
-
-    auto ret = router.recv(identity, zmq::recv_flags::none);
-    ret = router.recv(payload, zmq::recv_flags::none);
-
+    zmq::message_t sender_msg;
+    zmq::message_t content_msg;
+    auto ret = router.recv(sender_msg, zmq::recv_flags::none);
+    ret = router.recv(content_msg, zmq::recv_flags::none);
     if (!ret) {
-      std::cout << "[LOG] ERROR, Can't Receive Massage Correctly." << std::endl;
+      std::cout << "[LOG] " << RED << "ERROR, Can't Receive Massage Correctly."
+                << NO_COLOR << std::endl;
       continue;
     }
 
-    std::string sender_id = identity.to_string();
-    std::string body_str = payload.to_string();
-    std::cout << "[LOG] From: " << sender_id << std::endl;
-    std::cout << "[LOG] Body: \n" << body_str << std::endl;
+    std::string sender = sender_msg.to_string();
+    std::string content = content_msg.to_string();
+    std::cout << "[LOG] " << GREEN << "From: " << NO_COLOR << sender << NO_COLOR
+              << std::endl;
+    std::cout << "[LOG] " << GREEN << "Received: \n"
+              << NO_COLOR << content << std::endl;
 
     try {
-      auto received_json = json::parse(body_str);
-      std::string destination = received_json["to"];
+      auto received_json = json::parse(content);
 
       if (received_json["type"] == SEND_TRIPLE) {
-        int db_size = 10;
-        auto [triple_1, triple_2] = generate_beaver_triple(db_size);
-        triple_1.push_back({"type", SEND_TRIPLE});
-        triple_2.push_back({"type", SEND_TRIPLE});
-        send_msg(router, SERVER_1, triple_1.dump());
-        std::cout << "[LOG] Beaver Triple is sent to DB server 1.";
-        send_msg(router, SERVER_2, triple_2.dump());
-        std::cout << "[LOG] Beaver Triple is sent to DB server 2.";
+        std::ifstream i_file("db_server_1.json");
+        json table_json;
+        i_file >> table_json;
+        int db_size = table_json["size"];
+        for (int i = 0; i < db_size; i++) {
+          auto [triple_1, triple_2] = generate_beaver_triple();
+          triple_1.push_back({"type", SEND_TRIPLE});
+          triple_2.push_back({"type", SEND_TRIPLE});
+          send_msg(router, SERVER_1, triple_1.dump(2));
+          std::cout << "[LOG] " << GREEN
+                    << "Beaver Triple is sent to DB server 1." << NO_COLOR
+                    << std::endl;
+          send_msg(router, SERVER_2, triple_2.dump(2));
+          std::cout << "[LOG] " << GREEN
+                    << "Beaver Triple is sent to DB server 2." << NO_COLOR
+                    << std::endl;
+        }
+        i_file.close();
 
-      } else if (received_json["type"] == QUERY_SELECT) {
-        send_msg(router, destination, body_str);
+      } else if (received_json["type"] == SHUT_DOWN) {
+        json shut_down_request = {{"type", SHUT_DOWN}};
+        send_msg(router, SERVER_1, shut_down_request.dump(2));
+        send_msg(router, SERVER_2, shut_down_request.dump(2));
+        std::cout << "[LOG] " << " System will shut out." << std::endl;
+        break;
 
       } else {
-        send_msg(router, destination, body_str);
-        std::cout << "[LOG] Forwarded to: " << sender_id << std::endl;
+        std::string destination = received_json["to"];
+        send_msg(router, destination, content);
+        std::cout << "[LOG] " << BLUE << "Sent to: " << NO_COLOR << destination
+                  << std::endl;
       }
     } catch (std::exception &e) {
-      std::cout << "[!] JSON Parse Error: " << e.what() << std::endl;
+      std::cout << "[LOG] " << RED << "Error: " << e.what() << std::endl;
     }
   }
 
