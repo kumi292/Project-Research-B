@@ -29,14 +29,10 @@ void send_query_insert(zmq::socket_t &sock) {
   NumType value_to_insert;
   std::cin >> value_to_insert;
   SharesType value_shares = BT::create_shares(value_to_insert);
-  json json_to_send_server_1 = {{"from", CLIENT},
-                                {"to", SERVER_1},
-                                {"type", QUERY_INSERT},
-                                {"value", value_shares[0]}};
-  json json_to_send_server_2 = {{"from", CLIENT},
-                                {"to", SERVER_2},
-                                {"type", QUERY_INSERT},
-                                {"value", value_shares[1]}};
+  json json_to_send_server_1 = {
+      {"to", SERVER_1}, {"type", QUERY_INSERT}, {"value", value_shares[0]}};
+  json json_to_send_server_2 = {
+      {"to", SERVER_2}, {"type", QUERY_INSERT}, {"value", value_shares[1]}};
   send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
   send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
 }
