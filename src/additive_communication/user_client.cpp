@@ -1,5 +1,6 @@
 #include "json.hpp"
 #include "zmq.hpp"
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -14,8 +15,17 @@ void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
   std::cout << BLUE << "Sent: \n" << NO_COLOR << content << std::endl;
 }
 
+int retrieve_db_size() {
+  std::ifstream i_file("db_server_1.json");
+  json table_json;
+  i_file >> table_json;
+  i_file.close();
+  return table_json["size"];
+}
+
 void send_query_insert(zmq::socket_t &sock) {
-  std::cout << "Enter value to insert: ";
+  int db_size = retrieve_db_size();
+  std::cout << "Enter value to insert (next id: " << db_size << "): ";
   NumType value_to_insert;
   std::cin >> value_to_insert;
   SharesType value_shares = BT::create_shares(value_to_insert);
