@@ -23,12 +23,12 @@ std::pair<json, json> generate_beaver_triple() {
   SharesType triple_b_shares = BT::create_shares(triple_b);
   SharesType triple_c_shares = BT::create_shares(triple_a * triple_b);
 
-  triple_1["triple_a"] = (triple_a_shares[0]);
-  triple_2["triple_a"] = (triple_a_shares[1]);
-  triple_1["triple_b"] = (triple_b_shares[0]);
-  triple_2["triple_b"] = (triple_b_shares[1]);
-  triple_1["triple_c"] = (triple_c_shares[0]);
-  triple_2["triple_c"] = (triple_c_shares[1]);
+  triple_1["triple_a_share"] = (triple_a_shares[0]);
+  triple_2["triple_a_share"] = (triple_a_shares[1]);
+  triple_1["triple_b_share"] = (triple_b_shares[0]);
+  triple_2["triple_b_share"] = (triple_b_shares[1]);
+  triple_1["triple_c_share"] = (triple_c_shares[0]);
+  triple_2["triple_c_share"] = (triple_c_shares[1]);
   return {triple_1, triple_2};
 }
 
