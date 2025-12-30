@@ -38,6 +38,9 @@ void send_request_to_generating_triple(zmq::socket_t &sock) {
 
 void send_query_select(zmq::socket_t &sock) {}
 
+void send_request_to_shut_down(zmq::socket_t &sock) {
+  json generate_shutdown_request = {{"type", SHUT_DOWN}};
+  send_to_proxy_hub(sock, generate_shutdown_request.dump(2));
 }
 
 int main() {
@@ -51,7 +54,7 @@ int main() {
   while (true) {
     std::cout << "-------------------------\n";
     std::cout << "Which query to execute\n";
-    std::cout << "1. INSERT\n2. SELECT\n";
+    std::cout << "1. INSERT\n2. SELECT\n3. SHUT DOWN\n";
     std::cout << "Enter number: ";
     std::cin >> inputted_str;
 
@@ -61,6 +64,11 @@ int main() {
     } else if (inputted_str == "2") {
       send_request_to_generating_triple(sock);
       send_query_select(sock);
+
+    } else if (inputted_str == "3") {
+      std::cout << "The program will be finished.\n";
+      send_request_to_shut_down(sock);
+      break;
 
     } else {
       std::cout << "Sorry, try again.\n";
