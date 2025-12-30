@@ -70,7 +70,65 @@ void exec_insert(json received_json) {
   save_table();
 }
 
-void exec_select(json received_json) {
+NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
+                            NumType share_2) {
+  // Beaver Tripleの生成を要求(server_1のみ)し、受信
+  if (MY_SERVER == SERVER_1) {
+    json request_for_beaver_triple = {{"type", SEND_TRIPLE}};
+    send_to_proxy_hub(sock, request_for_beaver_triple.dump(2));
+  }
+  zmq::message_t content_msg;
+  auto ret = sock.recv(content_msg, zmq::recv_flags::none);
+  if (!ret) {
+    std::cout << RED << "ERROR, Can't Receive Massage Correctly." << NO_COLOR
+              << std::endl;
+    exit(1);
+  }
+  std::string content = content_msg.to_string();
+  std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
+  auto received_json = json::parse(content);
+  if (received_json["type"] != SEND_TRIPLE)
+    exit(1);
+  NumType triple_a_share = received_json["triple_a_share"];
+  NumType triple_b_share = received_json["triple_b_share"];
+  NumType triple_c_share = received_json["triple_c_share"];
+
+  // sigmaとrhoのシェアを計算しもう片方のサーバーへ送信
+  NumType sigma_share = share_1 - triple_a_share;
+  NumType rho_share = share_2 - triple_b_share;
+  json exchange_triple_share = {{"to", OTHER_SERVER},
+                                {"type", EXCHANGE_TRIPLE},
+                                {"sigma_share", sigma_share},
+                                {"rho_share", rho_share}};
+  send_to_proxy_hub(sock, exchange_triple_share.dump(2));
+
+  // 片方のサーバーからsigmaとrhoのシェアを受信し復元
+  ret = sock.recv(content_msg, zmq::recv_flags::none);
+  if (!ret) {
+    std::cout << RED << "ERROR, Can't Receive Massage Correctly." << NO_COLOR
+              << std::endl;
+    exit(1);
+  }
+  content = content_msg.to_string();
+  std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
+  received_json = json::parse(content);
+  if (received_json["type"] != EXCHANGE_TRIPLE)
+    exit(1);
+  NumType received_sigma_share = received_json["sigma_share"];
+  NumType received_rho_share = received_json["rho_share"];
+  NumType sigma =
+      BT::reconstruct_from_shares({sigma_share, received_sigma_share});
+  NumType rho = BT::reconstruct_from_shares({rho_share, received_rho_share});
+
+  // 掛け算を実行
+  NumType product_share =
+      rho * triple_a_share + sigma * triple_b_share + triple_c_share;
+  if (MY_SERVER == SERVER_1)
+    product_share += sigma * rho;
+
+  return product_share;
+}
+
   std::vector<NumType> search_vector_share = received_json["value"];
   std::cout << YELLOW << "SELECT" << NO_COLOR << std::endl;
 }
