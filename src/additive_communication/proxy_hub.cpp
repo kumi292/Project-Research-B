@@ -53,7 +53,7 @@ int main() {
     auto ret = router.recv(sender_msg, zmq::recv_flags::none);
     ret = router.recv(content_msg, zmq::recv_flags::none);
     if (!ret) {
-      std::cout << "[LOG] " << RED << "ERROR, Can't Receive Massage Correctly."
+      std::cout << "[LOG] " << RED << "ERROR, Can't Receive Message Correctly."
                 << NO_COLOR << std::endl;
       continue;
     }

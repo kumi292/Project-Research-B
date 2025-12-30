@@ -81,7 +81,7 @@ NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
   zmq::message_t content_msg;
   auto ret = sock.recv(content_msg, zmq::recv_flags::none);
   if (!ret) {
-    std::cout << RED << "ERROR, Can't Receive Massage Correctly." << NO_COLOR
+    std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
               << std::endl;
     exit(1);
   }
@@ -106,7 +106,7 @@ NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
   // 片方のサーバーからsigmaとrhoのシェアを受信し復元
   ret = sock.recv(content_msg, zmq::recv_flags::none);
   if (!ret) {
-    std::cout << RED << "ERROR, Can't Receive Massage Correctly." << NO_COLOR
+    std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
               << std::endl;
     exit(1);
   }
@@ -179,11 +179,12 @@ int main(int argc, char *argv[]) {
   load_table();
 
   while (true) {
+    std::cout << std::endl;
     std::cout << "Waiting for a query...\n";
     zmq::message_t content_msg;
     auto ret = sock.recv(content_msg, zmq::recv_flags::none);
     if (!ret) {
-      std::cout << RED << "ERROR, Can't Receive Massage Correctly." << NO_COLOR
+      std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
                 << std::endl;
       continue;
     }

@@ -85,7 +85,7 @@ void send_query_select(zmq::socket_t &sock) {
   while (!is_received_from_server_1 || !is_received_from_server_2) {
     auto ret = sock.recv(content_msg, zmq::recv_flags::none);
     if (!ret) {
-      std::cout << RED << "ERROR, Can't Receive Massage Correctly." << NO_COLOR
+      std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
                 << std::endl;
       return;
     }
