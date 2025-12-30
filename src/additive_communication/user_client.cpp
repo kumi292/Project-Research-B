@@ -116,11 +116,6 @@ void send_query_truncate(zmq::socket_t &sock) {
   send_to_proxy_hub(sock, generate_truncate_query.dump(2));
 }
 
-void send_request_to_generating_triple(zmq::socket_t &sock) {
-  json generate_triple_request = {{"type", SEND_TRIPLE}};
-  send_to_proxy_hub(sock, generate_triple_request.dump(2));
-}
-
 void send_request_to_shut_down(zmq::socket_t &sock) {
   json generate_shutdown_request = {{"type", SHUT_DOWN}};
   send_to_proxy_hub(sock, generate_shutdown_request.dump(2));
@@ -145,7 +140,6 @@ int main() {
       send_query_insert(sock);
 
     } else if (inputted_str == "2") {
-      send_request_to_generating_triple(sock);
       send_query_select(sock);
 
     } else if (inputted_str == "3") {
