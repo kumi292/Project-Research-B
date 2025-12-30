@@ -66,47 +66,34 @@ int main() {
     std::cout << "[LOG] " << GREEN << "Received: \n"
               << NO_COLOR << content << std::endl;
 
-    try {
-      auto received_json = json::parse(content);
+    auto received_json = json::parse(content);
 
-      if (received_json["type"] == SEND_TRIPLE) {
-        std::ifstream i_file("db_server_1.json");
-        json table_json;
-        i_file >> table_json;
-        int db_size = table_json["size"];
-        for (int i = 0; i < db_size; i++) {
-          auto [triple_1, triple_2] = generate_beaver_triple();
-          triple_1.push_back({"type", SEND_TRIPLE});
-          triple_2.push_back({"type", SEND_TRIPLE});
-          send_msg(router, SERVER_1, triple_1.dump(2));
-          std::cout << "[LOG] " << GREEN
-                    << "Beaver Triple is sent to DB server 1." << NO_COLOR
-                    << std::endl;
-          send_msg(router, SERVER_2, triple_2.dump(2));
-          std::cout << "[LOG] " << GREEN
-                    << "Beaver Triple is sent to DB server 2." << NO_COLOR
-                    << std::endl;
-        }
-        i_file.close();
+    if (received_json["type"] == SEND_TRIPLE) {
+      auto [triple_1, triple_2] = generate_beaver_triple();
+      triple_1.push_back({"type", SEND_TRIPLE});
+      triple_2.push_back({"type", SEND_TRIPLE});
+      send_msg(router, SERVER_1, triple_1.dump(2));
+      std::cout << "[LOG] " << GREEN << "Beaver Triple is sent to DB server 1."
+                << NO_COLOR << std::endl;
+      send_msg(router, SERVER_2, triple_2.dump(2));
+      std::cout << "[LOG] " << GREEN << "Beaver Triple is sent to DB server 2."
+                << NO_COLOR << std::endl;
 
-      } else if (received_json["type"] == SHUT_DOWN ||
-                 received_json["type"] == QUERY_TRUNCATE) {
-        send_msg(router, SERVER_1, received_json.dump(2));
-        send_msg(router, SERVER_2, received_json.dump(2));
+    } else if (received_json["type"] == SHUT_DOWN ||
+               received_json["type"] == QUERY_TRUNCATE) {
+      send_msg(router, SERVER_1, received_json.dump(2));
+      send_msg(router, SERVER_2, received_json.dump(2));
 
-        if (received_json["type"] == SHUT_DOWN) {
-          std::cout << "[LOG] " << " System will shut out." << std::endl;
-          break;
-        }
-
-      } else {
-        std::string destination = received_json["to"];
-        send_msg(router, destination, content);
-        std::cout << "[LOG] " << BLUE << "Sent to: " << NO_COLOR << destination
-                  << std::endl;
+      if (received_json["type"] == SHUT_DOWN) {
+        std::cout << "[LOG] " << " System will shut out." << std::endl;
+        break;
       }
-    } catch (std::exception &e) {
-      std::cout << "[LOG] " << RED << "Error: " << e.what() << std::endl;
+
+    } else {
+      std::string destination = received_json["to"];
+      send_msg(router, destination, content);
+      std::cout << "[LOG] " << BLUE << "Sent to: " << NO_COLOR << destination
+                << std::endl;
     }
   }
 

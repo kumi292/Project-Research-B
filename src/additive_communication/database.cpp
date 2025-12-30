@@ -70,6 +70,11 @@ void exec_insert(json received_json) {
   save_table();
 }
 
+void exec_select(json received_json) {
+  std::vector<NumType> search_vector_share = received_json["value"];
+  std::cout << YELLOW << "SELECT" << NO_COLOR << std::endl;
+}
+
 int main(int argc, char *argv[]) {
   // 引数1 → SERVER 1として起動
   // 引数2 → SERVER 2として起動
@@ -109,24 +114,19 @@ int main(int argc, char *argv[]) {
     std::cout << "[LOG] " << GREEN << "Received: \n"
               << NO_COLOR << content << std::endl;
 
-    try {
-      auto received_json = json::parse(content);
+    auto received_json = json::parse(content);
 
-      if (received_json["type"] == QUERY_INSERT) {
-        exec_insert(received_json);
-      } else if (received_json["type"] == SEND_TRIPLE) {
+    if (received_json["type"] == QUERY_INSERT) {
+      exec_insert(received_json);
+    } else if (received_json["type"] == SEND_TRIPLE) {
 
-      } else if (received_json["type"] == QUERY_TRUNCATE) {
-        truncate_table();
+    } else if (received_json["type"] == QUERY_TRUNCATE) {
+      truncate_table();
 
-      } else if (received_json["type"] == SHUT_DOWN) {
-        break;
-      }
-      std::cout << "-------------------------\n";
-
-    } catch (std::exception &e) {
-      std::cout << "[LOG] " << RED << "Error: " << e.what() << std::endl;
+    } else if (received_json["type"] == SHUT_DOWN) {
+      break;
     }
+    std::cout << "-------------------------\n";
   }
   return 0;
 }
