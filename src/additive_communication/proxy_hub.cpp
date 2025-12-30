@@ -1,6 +1,5 @@
 #include "json.hpp"
 #include "zmq.hpp"
-#include <fstream>
 #include <iostream>
 #include <random>
 #include <string>

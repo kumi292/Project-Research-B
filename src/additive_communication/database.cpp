@@ -19,10 +19,11 @@ std::vector<NumType> table;
 void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
   zmq::message_t content_msg(content);
   sock.send(content_msg, zmq::send_flags::none);
-  std::cout << "Sent: \n" << content_msg << std::endl;
+  std::cout << BLUE << "Sent: \n" << NO_COLOR << content << std::endl;
 }
 
 void init_table() {
+  table = {};
   json init_table_json = {{"size", 0}, {"records", {}}};
   std::ofstream o_file(DB_FILE);
   o_file << init_table_json.dump(2);
@@ -139,7 +140,8 @@ void exec_select(zmq::socket_t &sock, json received_json) {
   for (int id_i = 0; id_i < db_size; id_i++) {
     calculated_result +=
         exec_multiplication(sock, table[id_i], search_vector_share[id_i]);
-    if (id_i % 30 == 0)
+    if (id_i % 3 == 0)
+      // オーバーフロー防止
       calculated_result = mod(calculated_result, MODULUS);
   }
 

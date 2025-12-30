@@ -41,17 +41,17 @@ void send_query_select(zmq::socket_t &sock) {
   int db_size = retrieve_db_size();
   if (db_size == 0) {
     std::cout << RED << "Cannot execute SELECT query in an empty table."
-              << std::endl;
+              << NO_COLOR << std::endl;
     return;
   }
 
   // 検索ベクトル作成
-  std::cout << "Enter id to select: ";
+  std::cout << "Enter id to select (id: 0 ~ " << db_size - 1 << "): ";
   int id_to_select;
   std::cin >> id_to_select;
-  if (id_to_select > db_size - 1) {
-    std::cout << RED << "ERROR, inputted number is too big for the table."
-              << NO_COLOR << std::endl;
+  if (id_to_select > db_size - 1 || id_to_select < 0) {
+    std::cout << RED << "ERROR, inputted number is invalid." << NO_COLOR
+              << std::endl;
     return;
   }
   std::vector<int> search_vector(db_size);
@@ -73,6 +73,8 @@ void send_query_select(zmq::socket_t &sock) {
   json json_to_send_server_2 = {{"to", SERVER_2},
                                 {"type", QUERY_SELECT},
                                 {"value", search_vector_share_2}};
+  send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
+  send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
 
   // 両サーバーから応答が返ってくるまで待機
   std::cout << "Waiting for response..." << std::endl;
@@ -83,14 +85,13 @@ void send_query_select(zmq::socket_t &sock) {
   while (!is_received_from_server_1 || !is_received_from_server_2) {
     auto ret = sock.recv(content_msg, zmq::recv_flags::none);
     if (!ret) {
-      std::cout << "[LOG] " << RED << "ERROR, Can't Receive Massage Correctly."
-                << NO_COLOR << std::endl;
+      std::cout << RED << "ERROR, Can't Receive Massage Correctly." << NO_COLOR
+                << std::endl;
       return;
     }
 
     std::string content = content_msg.to_string();
-    std::cout << "[LOG] " << GREEN << "Received: \n"
-              << NO_COLOR << content << std::endl;
+    std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
     auto received_json = json::parse(content);
     if (received_json["from"] == SERVER_1) {
       is_received_from_server_1 = true;
@@ -132,7 +133,7 @@ int main() {
   while (true) {
     std::cout << "-------------------------\n";
     std::cout << "Which query to execute\n";
-    std::cout << "1. INSERT\n2. SELECT\n3. TRUNCATE\n4. SHUT DOWN\n";
+    std::cout << "1. INSERT\n2. SELECT\n3. TRUNCATE\n4. QUIT\n";
     std::cout << "Enter number: ";
     std::cin >> inputted_str;
 

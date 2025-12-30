@@ -18,7 +18,7 @@ const std::string SHUT_DOWN = "SHUT DOWN";
 const std::string RED = "\033[31m";
 const std::string GREEN = "\033[32m";
 const std::string YELLOW = "\033[33m";
-const std::string BLUE = "\033[34m";
+const std::string BLUE = "\033[36m";
 const std::string NO_COLOR = "\033[m";
 
 using NumType = long long;
