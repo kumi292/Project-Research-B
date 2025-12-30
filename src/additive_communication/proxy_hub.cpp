@@ -44,5 +44,54 @@ void send_msg(zmq::socket_t &router, std::string destination,
 }
 
 int main() {
+  zmq::context_t ctx(1);
+  zmq::socket_t router(ctx, ZMQ_ROUTER);
+  router.bind("tcp://*:" + PORT);
+  std::cout << "Proxy hub started." << std::endl;
+  std::cout << "Listening on tcp://*:" + PORT + "..." << std::endl;
+
+  while (true) {
+    zmq::message_t identity;
+    zmq::message_t payload;
+
+    auto ret = router.recv(identity, zmq::recv_flags::none);
+    ret = router.recv(payload, zmq::recv_flags::none);
+
+    if (!ret) {
+      std::cout << "[LOG] ERROR, Can't Receive Massage Correctly." << std::endl;
+      continue;
+    }
+
+    std::string sender_id = identity.to_string();
+    std::string body_str = payload.to_string();
+    std::cout << "[LOG] From: " << sender_id << std::endl;
+    std::cout << "[LOG] Body: \n" << body_str << std::endl;
+
+    try {
+      auto received_json = json::parse(body_str);
+      std::string destination = received_json["to"];
+
+      if (received_json["type"] == SEND_TRIPLE) {
+        int db_size = 10;
+        auto [triple_1, triple_2] = generate_beaver_triple(db_size);
+        triple_1.push_back({"type", SEND_TRIPLE});
+        triple_2.push_back({"type", SEND_TRIPLE});
+        send_msg(router, SERVER_1, triple_1.dump());
+        std::cout << "[LOG] Beaver Triple is sent to DB server 1.";
+        send_msg(router, SERVER_2, triple_2.dump());
+        std::cout << "[LOG] Beaver Triple is sent to DB server 2.";
+
+      } else if (received_json["type"] == QUERY_SELECT) {
+        send_msg(router, destination, body_str);
+
+      } else {
+        send_msg(router, destination, body_str);
+        std::cout << "[LOG] Forwarded to: " << sender_id << std::endl;
+      }
+    } catch (std::exception &e) {
+      std::cout << "[!] JSON Parse Error: " << e.what() << std::endl;
+    }
+  }
+
   return 0;
 }
