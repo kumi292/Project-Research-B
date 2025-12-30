@@ -29,10 +29,14 @@ void send_query_insert(zmq::socket_t &sock) {
   NumType value_to_insert;
   std::cin >> value_to_insert;
   SharesType value_shares = BT::create_shares(value_to_insert);
-  json json_to_send_server_1 = {
-      {"to", SERVER_1}, {"type", QUERY_INSERT}, {"value", value_shares[0]}};
-  json json_to_send_server_2 = {
-      {"to", SERVER_2}, {"type", QUERY_INSERT}, {"value", value_shares[1]}};
+  json json_to_send_server_1 = {{"from", CLIENT},
+                                {"to", SERVER_1},
+                                {"type", QUERY_INSERT},
+                                {"value", value_shares[0]}};
+  json json_to_send_server_2 = {{"from", CLIENT},
+                                {"to", SERVER_2},
+                                {"type", QUERY_INSERT},
+                                {"value", value_shares[1]}};
   send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
   send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
 }
@@ -67,10 +71,12 @@ void send_query_select(zmq::socket_t &sock) {
   }
 
   // 検索ベクトルのシェアを送信
-  json json_to_send_server_1 = {{"to", SERVER_1},
+  json json_to_send_server_1 = {{"from", CLIENT},
+                                {"to", SERVER_1},
                                 {"type", QUERY_SELECT},
                                 {"value", search_vector_share_1}};
-  json json_to_send_server_2 = {{"to", SERVER_2},
+  json json_to_send_server_2 = {{"from", CLIENT},
+                                {"to", SERVER_2},
                                 {"type", QUERY_SELECT},
                                 {"value", search_vector_share_2}};
   send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
@@ -131,7 +137,6 @@ int main() {
   std::string inputted_str;
 
   while (true) {
-    std::cout << "-------------------------\n";
     std::cout << "Which query to execute\n";
     std::cout << "1. INSERT\n2. SELECT\n3. TRUNCATE\n4. QUIT\n";
     std::cout << "Enter number: ";
@@ -154,6 +159,8 @@ int main() {
     } else {
       std::cout << "Sorry, try again.\n";
     }
+    std::cout << std::endl;
+    std::cout << "-------------------------\n";
   }
   return 0;
 }

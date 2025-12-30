@@ -91,7 +91,7 @@ int main() {
     } else {
       std::string destination = received_json["to"];
       send_msg(router, destination, content);
-      std::cout << "[LOG] " << BLUE << "Sent to: " << NO_COLOR << destination
+      std::cout << "----> " << BLUE << "Sent to: " << NO_COLOR << destination
                 << std::endl;
     }
   }

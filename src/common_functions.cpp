@@ -1,5 +1,7 @@
 #include "common_functions.h"
 
+#include <cstdio>
+#include <iostream>
 #include <stdexcept>
 #include <vector>
 
@@ -26,4 +28,5 @@ void print_table(std::vector<NumType> &table, int limit, bool reverse, int id) {
   }
 
   std::printf("+--------+--------------+\n");
+  std::cout << "(total " << db_size << " records" << std::endl;
 }

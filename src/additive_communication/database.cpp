@@ -97,7 +97,8 @@ NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
   // sigmaとrhoのシェアを計算しもう片方のサーバーへ送信
   NumType sigma_share = share_1 - triple_a_share;
   NumType rho_share = share_2 - triple_b_share;
-  json exchange_triple_share = {{"to", OTHER_SERVER},
+  json exchange_triple_share = {{"from", MY_SERVER},
+                                {"to", OTHER_SERVER},
                                 {"type", EXCHANGE_TRIPLE},
                                 {"sigma_share", sigma_share},
                                 {"rho_share", rho_share}};
@@ -132,7 +133,6 @@ NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
 
 void exec_select(zmq::socket_t &sock, json received_json) {
   std::vector<NumType> search_vector_share = received_json["value"];
-  std::cout << YELLOW << "SELECT" << NO_COLOR << std::endl;
   NumType calculated_result = 0LL;
   int db_size = table.size();
 
@@ -140,7 +140,7 @@ void exec_select(zmq::socket_t &sock, json received_json) {
   for (int id_i = 0; id_i < db_size; id_i++) {
     calculated_result +=
         exec_multiplication(sock, table[id_i], search_vector_share[id_i]);
-    if (id_i % 3 == 0)
+    if (id_i % 2 == 0)
       // オーバーフロー防止
       calculated_result = mod(calculated_result, MODULUS);
   }
@@ -151,6 +151,9 @@ void exec_select(zmq::socket_t &sock, json received_json) {
                             {"type", RETURN_VALUE},
                             {"value", calculated_result}};
   send_to_proxy_hub(sock, result_value_json.dump(2));
+
+  std::cout << YELLOW << "SELECT " << NO_COLOR << "value: " << calculated_result
+            << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -179,7 +182,6 @@ int main(int argc, char *argv[]) {
   load_table();
 
   while (true) {
-    std::cout << std::endl;
     std::cout << "Waiting for a query...\n";
     zmq::message_t content_msg;
     auto ret = sock.recv(content_msg, zmq::recv_flags::none);
@@ -206,6 +208,7 @@ int main(int argc, char *argv[]) {
     } else if (received_json["type"] == SHUT_DOWN) {
       break;
     }
+    std::cout << std::endl;
     std::cout << "-------------------------\n";
   }
   return 0;
