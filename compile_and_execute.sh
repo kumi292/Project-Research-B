@@ -19,7 +19,6 @@ if [ $1 = "additive_communication" ]; then
     echo "failed in compiling (status: $exit_code)"
     exit $exit_code
   fi  
-fi
 else
   if [ $1 = "main" ]; then
     echo "executing main..."
