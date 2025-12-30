@@ -105,14 +105,13 @@ int main(int argc, char *argv[]) {
     zmq::message_t content_msg;
     auto ret = sock.recv(content_msg, zmq::recv_flags::none);
     if (!ret) {
-      std::cout << "[LOG] " << RED << "ERROR, Can't Receive Massage Correctly."
-                << NO_COLOR << std::endl;
+      std::cout << RED << "ERROR, Can't Receive Massage Correctly." << NO_COLOR
+                << std::endl;
       continue;
     }
 
     std::string content = content_msg.to_string();
-    std::cout << "[LOG] " << GREEN << "Received: \n"
-              << NO_COLOR << content << std::endl;
+    std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
 
     auto received_json = json::parse(content);
 
