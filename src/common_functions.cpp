@@ -16,7 +16,7 @@ void print_table(std::vector<NumType> &table, int limit, bool reverse, int id) {
   std::printf("+--------+--------------+\n");
   std::printf("|%3sid%3s|%5sdata%5s|\n", "", "", "", "");
   std::printf("+--------+--------------+\n");
-  if (id != -1) {
+  if (id == -1) {
     for (int print_count = 0; id_i < db_size && print_count < limit;
          id_i++, print_count++) {
       std::printf("|%5d%3s|%12lld%2s|\n", id_i, "", table[id_i], "");
