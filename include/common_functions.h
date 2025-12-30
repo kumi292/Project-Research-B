@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 const std::string PORT = "10000";
 const std::string CLIENT = "CLIENT";
@@ -22,3 +23,4 @@ const std::string NO_COLOR = "\033[m";
 
 using NumType = long long;
 NumType mod(NumType dividend, NumType divisor);
+void print_table(std::vector<NumType> &table, int limit, bool reverse = false);

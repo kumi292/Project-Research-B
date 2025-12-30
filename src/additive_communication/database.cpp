@@ -22,19 +22,6 @@ void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
   std::cout << "Sent: \n" << content_msg << std::endl;
 }
 
-void print_table(int limit, bool reverse = false) {
-  const int db_size = table.size();
-  int id_i = reverse && db_size - limit >= 0 ? db_size - limit : 0;
-  std::printf("+--------+--------------+\n");
-  std::printf("|%3sid%3s|%5sdata%5s|\n", "", "", "", "");
-  std::printf("+--------+--------------+\n");
-  for (int print_count = 0; id_i < db_size && print_count < limit;
-       id_i++, print_count++) {
-    std::printf("|%5d%3s|%12lld%2s|\n", id_i, "", table[id_i], "");
-  }
-  std::printf("+--------+--------------+\n");
-}
-
 void init_table() {
   json init_table_json = {{"size", 0}, {"records", {}}};
   std::ofstream o_file(DB_FILE);
@@ -52,7 +39,7 @@ void load_table() {
   i_file >> table_json;
   if (table_json["size"] != 0) {
     table_json["records"].get_to(table);
-    print_table(10);
+    print_table(table, 10);
   } else {
     std::cout << "No records in the table." << std::endl;
   }
@@ -67,7 +54,7 @@ void save_table() {
   std::ofstream o_file(DB_FILE);
   o_file << table_json_to_save.dump(2);
   o_file.close();
-  print_table(10, true);
+  print_table(table, 10, true);
 }
 
 void truncate_table() {
