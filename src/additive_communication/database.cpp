@@ -50,8 +50,12 @@ void load_table() {
   }
   json table_json;
   i_file >> table_json;
-  table_json["records"].get_to(table);
-  print_table(10);
+  if (table_json["size"] != 0) {
+    table_json["records"].get_to(table);
+    print_table(10);
+  } else {
+    std::cout << "No records in the table." << std::endl;
+  }
   i_file.close();
 }
 
@@ -66,7 +70,10 @@ void save_table() {
   print_table(10, true);
 }
 
-void truncate_table() { init_table(); }
+void truncate_table() {
+  std::cout << YELLOW << "TRUNCATE" << NO_COLOR << std::endl;
+  init_table();
+}
 
 void exec_insert(json received_json) {
   NumType value = received_json["value"];
@@ -121,6 +128,9 @@ int main(int argc, char *argv[]) {
       if (received_json["type"] == QUERY_INSERT) {
         exec_insert(received_json);
       } else if (received_json["type"] == SEND_TRIPLE) {
+
+      } else if (received_json["type"] == QUERY_TRUNCATE) {
+        truncate_table();
 
       } else if (received_json["type"] == SHUT_DOWN) {
         break;

@@ -89,12 +89,15 @@ int main() {
         }
         i_file.close();
 
-      } else if (received_json["type"] == SHUT_DOWN) {
-        json shut_down_request = {{"type", SHUT_DOWN}};
-        send_msg(router, SERVER_1, shut_down_request.dump(2));
-        send_msg(router, SERVER_2, shut_down_request.dump(2));
-        std::cout << "[LOG] " << " System will shut out." << std::endl;
-        break;
+      } else if (received_json["type"] == SHUT_DOWN ||
+                 received_json["type"] == QUERY_TRUNCATE) {
+        send_msg(router, SERVER_1, received_json.dump(2));
+        send_msg(router, SERVER_2, received_json.dump(2));
+
+        if (received_json["type"] == SHUT_DOWN) {
+          std::cout << "[LOG] " << " System will shut out." << std::endl;
+          break;
+        }
 
       } else {
         std::string destination = received_json["to"];
