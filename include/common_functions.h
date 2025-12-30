@@ -12,6 +12,10 @@ const std::string QUERY_RESULT = "QUERY RESULT";
 const std::string SEND_TRIPLE = "SEND TRIPLE";
 const std::string EXCHANGE_TRIPLE = "EXCHANGE TRIPLE";
 const std::string RETURN_VALUE = "RETURN VALUE";
+const std::string RED = "\033[31m";
+const std::string GREEN = "\033[32m";
+const std::string BLUE = "\033[34m";
+const std::string NO_COLOR = "\033[m";
 
 using NumType = long long;
 NumType mod(NumType dividend, NumType divisor);
