@@ -23,4 +23,5 @@ const std::string NO_COLOR = "\033[m";
 
 using NumType = long long;
 NumType mod(NumType dividend, NumType divisor);
-void print_table(std::vector<NumType> &table, int limit, bool reverse = false);
+void print_table(std::vector<NumType> &table, int limit, bool reverse = false,
+                 int id = -1);

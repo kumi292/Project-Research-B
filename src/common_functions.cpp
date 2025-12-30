@@ -10,15 +10,20 @@ NumType mod(NumType dividend, NumType divisor) {
                        : (dividend % divisor + divisor) % divisor;
 }
 
-void print_table(std::vector<NumType> &table, int limit, bool reverse) {
+void print_table(std::vector<NumType> &table, int limit, bool reverse, int id) {
   const int db_size = table.size();
   int id_i = reverse && db_size - limit >= 0 ? db_size - limit : 0;
   std::printf("+--------+--------------+\n");
   std::printf("|%3sid%3s|%5sdata%5s|\n", "", "", "", "");
   std::printf("+--------+--------------+\n");
-  for (int print_count = 0; id_i < db_size && print_count < limit;
-       id_i++, print_count++) {
-    std::printf("|%5d%3s|%12lld%2s|\n", id_i, "", table[id_i], "");
+  if (id != -1) {
+    for (int print_count = 0; id_i < db_size && print_count < limit;
+         id_i++, print_count++) {
+      std::printf("|%5d%3s|%12lld%2s|\n", id_i, "", table[id_i], "");
+    }
+  } else {
+    std::printf("|%5d%3s|%12lld%2s|\n", id, "", table[id_i], "");
   }
+
   std::printf("+--------+--------------+\n");
 }
