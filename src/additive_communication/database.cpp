@@ -129,8 +129,26 @@ NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
   return product_share;
 }
 
+void exec_select(zmq::socket_t &sock, json received_json) {
   std::vector<NumType> search_vector_share = received_json["value"];
   std::cout << YELLOW << "SELECT" << NO_COLOR << std::endl;
+  NumType calculated_result = 0LL;
+  int db_size = table.size();
+
+  // 内積を計算
+  for (int id_i = 0; id_i < db_size; id_i++) {
+    calculated_result +=
+        exec_multiplication(sock, table[id_i], search_vector_share[id_i]);
+    if (id_i % 30 == 0)
+      calculated_result = mod(calculated_result, MODULUS);
+  }
+
+  // 結果を送信
+  json result_value_json = {{"from", MY_SERVER},
+                            {"to", CLIENT},
+                            {"type", RETURN_VALUE},
+                            {"value", calculated_result}};
+  send_to_proxy_hub(sock, result_value_json.dump(2));
 }
 
 int main(int argc, char *argv[]) {
@@ -175,7 +193,9 @@ int main(int argc, char *argv[]) {
 
     if (received_json["type"] == QUERY_INSERT) {
       exec_insert(received_json);
-    } else if (received_json["type"] == SEND_TRIPLE) {
+
+    } else if (received_json["type"] == QUERY_SELECT) {
+      exec_select(sock, received_json);
 
     } else if (received_json["type"] == QUERY_TRUNCATE) {
       truncate_table();
