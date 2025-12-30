@@ -8,10 +8,36 @@
 
 using json = nlohmann::json;
 
-void send_to_proxy_hub(zmq::socket_t &sock, std::string body) {
-  zmq::message_t body_msg(body);
-  sock.send(body_msg, zmq::send_flags::none);
-  std::cout << "Sent: \n" << body << std::endl;
+void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
+  zmq::message_t content_msg(content);
+  sock.send(content_msg, zmq::send_flags::none);
+  std::cout << BLUE << "Sent: \n" << NO_COLOR << content << std::endl;
+}
+
+void send_query_insert(zmq::socket_t &sock) {
+  std::cout << "Enter value to insert: ";
+  NumType value_to_insert;
+  std::cin >> value_to_insert;
+  SharesType value_shares = BT::create_shares(value_to_insert);
+  json json_to_send_server_1 = {{"from", CLIENT},
+                                {"to", SERVER_1},
+                                {"type", QUERY_INSERT},
+                                {"value", value_shares[0]}};
+  json json_to_send_server_2 = {{"from", CLIENT},
+                                {"to", SERVER_2},
+                                {"type", QUERY_INSERT},
+                                {"value", value_shares[1]}};
+  send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
+  send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
+}
+
+void send_request_to_generating_triple(zmq::socket_t &sock) {
+  json generate_triple_request = {{"type", SEND_TRIPLE}};
+  send_to_proxy_hub(sock, generate_triple_request.dump(2));
+}
+
+void send_query_select(zmq::socket_t &sock) {}
+
 }
 
 int main() {
@@ -30,21 +56,12 @@ int main() {
     std::cin >> inputted_str;
 
     if (inputted_str == "1") {
-      // INSERT文
-      std::cout << "Enter value to insert: ";
-      NumType value_to_insert;
-      std::cin >> value_to_insert;
-      SharesType value_shares = BT::create_shares(value_to_insert);
-      json json_to_send = {{{"to", SERVER_1},
-                            {"type", QUERY_INSERT},
-                            {"value", std::to_string(value_shares[0])}},
-                           {{"to", SERVER_2},
-                            {"type", QUERY_INSERT},
-                            {"value", std::to_string(value_shares[1])}}};
-      send_to_proxy_hub(sock, json_to_send.dump(2));
+      send_query_insert(sock);
 
     } else if (inputted_str == "2") {
-      // SELECT文
+      send_request_to_generating_triple(sock);
+      send_query_select(sock);
+
     } else {
       std::cout << "Sorry, try again.\n";
     }
