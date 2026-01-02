@@ -28,5 +28,5 @@ void print_table(std::vector<NumType> &table, int limit, bool reverse, int id) {
   }
 
   std::printf("+--------+--------------+\n");
-  std::cout << "(total " << db_size << " records" << std::endl;
+  std::cout << "(total " << db_size << " records)" << std::endl;
 }
