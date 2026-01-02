@@ -1,14 +1,15 @@
 #include "json.hpp"
 #include "zmq.hpp"
+#include <chrono>
 #include <iostream>
 #include <random>
 #include <string>
+#include <thread>
 
 #include "beaver_triple.h"
 #include "common_functions.h"
 
 using json = nlohmann::json;
-int communication_count = 0;
 
 std::pair<json, json> generate_beaver_triple() {
   std::random_device seed_gen;
@@ -35,9 +36,11 @@ void send_msg(zmq::socket_t &router, std::string destination,
               std::string body) {
   zmq::message_t dest_msg(destination);
   zmq::message_t body_msg(body);
+
+  // 通信が発生するたびに遅延を入れる
+  std::this_thread::sleep_for(std::chrono::milliseconds(LATENCY_MILS));
   router.send(dest_msg, zmq::send_flags::sndmore);
   router.send(body_msg, zmq::send_flags::none);
-  communication_count++;
 }
 
 int main() {

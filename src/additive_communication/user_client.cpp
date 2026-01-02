@@ -1,5 +1,6 @@
 #include "json.hpp"
 #include "zmq.hpp"
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -28,6 +29,7 @@ void send_query_insert(zmq::socket_t &sock) {
   std::cout << "Enter value to insert (next id: " << db_size << "): ";
   NumType value_to_insert;
   std::cin >> value_to_insert;
+
   SharesType value_shares = BT::create_shares(value_to_insert);
   json json_to_send_server_1 = {{"from", CLIENT},
                                 {"to", SERVER_1},
@@ -53,6 +55,9 @@ void send_query_select(zmq::socket_t &sock) {
   std::cout << "Enter id to select (id: 0 ~ " << db_size - 1 << "): ";
   int id_to_select;
   std::cin >> id_to_select;
+
+  // 計測開始
+  auto start_time = std::chrono::high_resolution_clock::now();
   if (id_to_select > db_size - 1 || id_to_select < 0) {
     std::cout << RED << "ERROR, inputted number is invalid." << NO_COLOR
               << std::endl;
@@ -116,6 +121,15 @@ void send_query_select(zmq::socket_t &sock) {
   std::vector<NumType> result_table = {
       BT::reconstruct_from_shares({value_from_server_1, value_from_server_2})};
   print_table(result_table, 1, false, id_to_select);
+
+  // 計測終了
+  auto end_time = std::chrono::high_resolution_clock::now();
+  auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                         end_time - start_time)
+                         .count();
+  std::cout << std::endl;
+  std::cout << "[Ended in " << YELLOW << duration_ms / 1000.0 << NO_COLOR
+            << " second]" << std::endl;
 }
 
 void send_query_truncate(zmq::socket_t &sock) {

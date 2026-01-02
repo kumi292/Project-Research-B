@@ -21,6 +21,8 @@ const std::string YELLOW = "\033[33m";
 const std::string BLUE = "\033[36m";
 const std::string NO_COLOR = "\033[m";
 
+const int LATENCY_MILS = 30;
+
 using NumType = long long;
 NumType mod(NumType dividend, NumType divisor);
 void print_table(std::vector<NumType> &table, int limit, bool reverse = false,
