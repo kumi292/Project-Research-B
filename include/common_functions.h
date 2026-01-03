@@ -7,6 +7,7 @@ const std::string PORT = "10000";
 const std::string CLIENT = "CLIENT";
 const std::string SERVER_1 = "SERVER 1";
 const std::string SERVER_2 = "SERVER 2";
+const std::string SERVER_3 = "SERVER 3";
 const std::string QUERY_SELECT = "QUERY SELECT";
 const std::string QUERY_INSERT = "QUERY INSERT";
 const std::string QUERY_RESULT = "QUERY RESULT";
