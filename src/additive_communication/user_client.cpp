@@ -17,7 +17,7 @@ void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
 }
 
 int retrieve_db_size() {
-  std::ifstream i_file("db_server_1.json");
+  std::ifstream i_file(DB_FILE_1);
   json table_json;
   i_file >> table_json;
   i_file.close();

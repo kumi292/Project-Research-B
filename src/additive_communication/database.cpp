@@ -166,11 +166,11 @@ int main(int argc, char *argv[]) {
   if (strcmp(argv[1], "1") == 0) {
     MY_SERVER = SERVER_1;
     OTHER_SERVER = SERVER_2;
-    DB_FILE = "db_server_1.json";
+    DB_FILE = DB_FILE_1;
   } else {
     MY_SERVER = SERVER_2;
     OTHER_SERVER = SERVER_1;
-    DB_FILE = "db_server_2.json";
+    DB_FILE = DB_FILE_2;
   }
 
   zmq::context_t ctx(1);

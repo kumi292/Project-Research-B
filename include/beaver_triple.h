@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "common_functions.h"
@@ -9,6 +10,8 @@ constexpr int PARTY_COUNT = 2;
 constexpr NumType MODULUS = 1LL << 28;
 constexpr NumType RANDOM_MAX = 1LL << 29;
 constexpr NumType TRIPLE_MAX = 1LL << 13;
+const std::string DB_FILE_1 = "src/additive_communication/db_server_1.json";
+const std::string DB_FILE_2 = "src/additive_communication/db_server_2.json";
 
 namespace BT {
 
