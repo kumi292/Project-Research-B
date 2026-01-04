@@ -10,18 +10,11 @@
 #include "common_functions.h"
 #include "replicated.h"
 
-using json = nlohmann::json;
 std::string MY_SERVER;
 std::string SERVER_TO_SEND_SHARE;
 std::string SERVER_TO_RECEIVE_SHARE;
 std::string DB_FILE;
 std::vector<NumType> table;
-
-void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
-  zmq::message_t content_msg(content);
-  sock.send(content_msg, zmq::send_flags::none);
-  std::cout << BLUE << "Sent: \n" << NO_COLOR << content << std::endl;
-}
 
 void init_table() {
   table = {};

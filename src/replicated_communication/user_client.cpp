@@ -8,14 +8,6 @@
 #include "common_functions.h"
 #include "replicated.h"
 
-using json = nlohmann::json;
-
-void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
-  zmq::message_t content_msg(content);
-  sock.send(content_msg, zmq::send_flags::none);
-  std::cout << BLUE << "Sent: \n" << NO_COLOR << content << std::endl;
-}
-
 int retrieve_db_size() {
   std::ifstream i_file(DB_FILE_1);
   json table_json;
