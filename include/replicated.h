@@ -27,5 +27,9 @@ SharesType multiply(std::vector<SharesType> parties_with_shares);
 SharesType inner_product(std::vector<SharesType> party1_shares,
                          std::vector<SharesType> party2_shares,
                          std::vector<SharesType> party3_shares);
+void print_all_table(std::vector<NumType> &column1,
+                     std::vector<NumType> &column2, int limit,
+                     bool tail = false);
+void print_id_value_as_table(int id, NumType value);
 
 } // namespace Replicated

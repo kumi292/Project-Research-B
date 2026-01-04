@@ -1,5 +1,6 @@
 #include "replicated.h"
 
+#include <iostream>
 #include <numeric>
 #include <random>
 #include <set>
@@ -100,6 +101,30 @@ SharesType inner_product(std::vector<SharesType> party1_shares,
   }
 
   return calculated_shares;
+}
+
+void print_all_table(std::vector<NumType> &column1,
+                     std::vector<NumType> &column2, int limit, bool tail) {
+  const int db_size = column1.size();
+  int id_i = tail && db_size - limit >= 0 ? db_size - limit : 0;
+  std::printf("+--------+--------------+--------------+\n");
+  std::printf("|%3sid%3s|%4sshare1%4s|%4sshare2%4s|\n", "", "", "", "", "", "");
+  std::printf("+--------+--------------+\n");
+  for (int print_count = 0; id_i < db_size && print_count < limit;
+       id_i++, print_count++) {
+    std::printf("|%5d%3s|%12lld%2s|%12lld%2s|\n", id_i, "", column1[id_i], "",
+                column2[id_i], "");
+  }
+  std::printf("+--------+--------------+--------------+\n");
+  std::cout << "(total " << db_size << " records)" << std::endl;
+}
+
+void print_id_value_as_table(int id, NumType value) {
+  std::printf("+--------+--------------+\n");
+  std::printf("|%3sid%3s|%5sdata%5s|\n", "", "", "", "");
+  std::printf("+--------+--------------+\n");
+  std::printf("|%5d%3s|%12lld%2s|\n", id, "", value, "");
+  std::printf("+--------+--------------+\n");
 }
 
 } // namespace Replicated
