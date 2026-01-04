@@ -6,7 +6,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <thread>
-#include <vector>
 
 NumType mod(NumType dividend, NumType divisor) {
   if (divisor <= 0)

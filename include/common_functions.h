@@ -3,7 +3,6 @@
 #include "json.hpp"
 #include "zmq.hpp"
 #include <string>
-#include <vector>
 
 const std::string PORT = "10000";
 const std::string CLIENT = "CLIENT";
