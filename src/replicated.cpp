@@ -109,7 +109,7 @@ void print_all_table(std::vector<NumType> &column1,
   int id_i = tail && db_size - limit >= 0 ? db_size - limit : 0;
   std::printf("+--------+--------------+--------------+\n");
   std::printf("|%3sid%3s|%4sshare1%4s|%4sshare2%4s|\n", "", "", "", "", "", "");
-  std::printf("+--------+--------------+\n");
+  std::printf("+--------+--------------+--------------+\n");
   for (int print_count = 0; id_i < db_size && print_count < limit;
        id_i++, print_count++) {
     std::printf("|%5d%3s|%12lld%2s|%12lld%2s|\n", id_i, "", column1[id_i], "",
