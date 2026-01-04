@@ -1,8 +1,13 @@
 #!/bin/zsh
-if [ $1 = "additive_communication" ]; then
+if [ $1 = "additive_communication" -o $1 = "replicated_communication" ]; then
   echo "executing $2 program..."
-  echo "clang++ -std=c++17 -Iinclude src/beaver_triple.cpp src/additive_communication/$2.cpp src/common_functions.cpp -o bin/$2 -lzmq"
-  clang++ -std=c++17 -Iinclude src/beaver_triple.cpp src/additive_communication/$2.cpp src/common_functions.cpp -o bin/$2 -lzmq
+  if [ $1 = "additive_communication" ]; then
+    echo "clang++ -std=c++17 -Iinclude src/beaver_triple.cpp src/$1/$2.cpp src/common_functions.cpp -o bin/$2 -lzmq"
+    clang++ -std=c++17 -Iinclude src/beaver_triple.cpp src/$1/$2.cpp src/common_functions.cpp -o bin/$2 -lzmq
+  else
+    echo "clang++ -std=c++17 -Iinclude src/replicated.cpp src/$1/$2.cpp src/common_functions.cpp -o bin/$2 -lzmq"
+    clang++ -std=c++17 -Iinclude src/replicated.cpp src/$1/$2.cpp src/common_functions.cpp -o bin/$2 -lzmq
+  fi
 
   exit_code=$?
   if [ $exit_code -eq 0 ]; then
