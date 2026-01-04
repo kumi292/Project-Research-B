@@ -12,7 +12,6 @@ const std::string QUERY_SELECT = "QUERY SELECT";
 const std::string QUERY_INSERT = "QUERY INSERT";
 const std::string QUERY_RESULT = "QUERY RESULT";
 const std::string QUERY_TRUNCATE = "QUERY TRUNCATE";
-const std::string SEND_TRIPLE = "SEND TRIPLE";
 const std::string EXCHANGE_TRIPLE = "EXCHANGE TRIPLE";
 const std::string RETURN_VALUE = "RETURN VALUE";
 const std::string SHUT_DOWN = "SHUT DOWN";
