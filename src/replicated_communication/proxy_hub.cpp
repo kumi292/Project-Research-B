@@ -36,6 +36,7 @@ int main() {
         received_json["type"] == QUERY_TRUNCATE) {
       send_msg(router, SERVER_1, received_json.dump(2));
       send_msg(router, SERVER_2, received_json.dump(2));
+      send_msg(router, SERVER_3, received_json.dump(2));
 
       if (received_json["type"] == SHUT_DOWN) {
         std::cout << "[LOG] " << " System will shut out." << std::endl;

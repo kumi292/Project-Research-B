@@ -62,86 +62,46 @@ void truncate_table() {
   init_table();
 }
 
-void exec_insert(json received_json) {
-  NumType value = received_json["value"];
-  std::cout << YELLOW << "INSERT " << NO_COLOR << "value: " << value
-            << std::endl;
-  table.push_back(value);
+void exec_insert(zmq::socket_t &sock, json received_json) {
+  NumType share = received_json["value"];
+
+  // 他のサーバーに自身のシェアを送信
+  json json_to_send_another_server = {{"from", MY_SERVER},
+                                      {"to", SERVER_TO_SEND_SHARE},
+                                      {"type", SEND_SHARE},
+                                      {"value", share}};
+  send_to_proxy_hub(sock, json_to_send_another_server.dump(2));
+  json json_from_another_server;
+  while (true) {
+    json_from_another_server = receive_json(sock);
+    if (json_from_another_server["type"] == SEND_SHARE &&
+        json_from_another_server["from"] == SERVER_TO_RECEIVE_SHARE)
+      break;
+  }
+  NumType share_from_another_server = json_from_another_server["value"];
+
+  std::cout << YELLOW << "INSERT " << NO_COLOR << "value: (" << share << ", "
+            << share_from_another_server << ")" << std::endl;
+  table_share_1.push_back(share);
+  table_share_2.push_back(share_from_another_server);
   save_table();
 }
 
-NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
-                            NumType share_2) {
-  // Beaver Tripleの生成を要求(server_1のみ)し、受信
-  if (MY_SERVER == SERVER_1) {
-    json request_for_beaver_triple = {{"type", SEND_TRIPLE}};
-    send_to_proxy_hub(sock, request_for_beaver_triple.dump(2));
-  }
-  zmq::message_t content_msg;
-  auto ret = sock.recv(content_msg, zmq::recv_flags::none);
-  if (!ret) {
-    std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
-              << std::endl;
-    exit(1);
-  }
-  std::string content = content_msg.to_string();
-  std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
-  auto received_json = json::parse(content);
-  if (received_json["type"] != SEND_TRIPLE)
-    exit(1);
-  NumType triple_a_share = received_json["triple_a_share"];
-  NumType triple_b_share = received_json["triple_b_share"];
-  NumType triple_c_share = received_json["triple_c_share"];
-
-  // sigmaとrhoのシェアを計算しもう片方のサーバーへ送信
-  NumType sigma_share = share_1 - triple_a_share;
-  NumType rho_share = share_2 - triple_b_share;
-  json exchange_triple_share = {{"from", MY_SERVER},
-                                {"to", OTHER_SERVER},
-                                {"type", EXCHANGE_TRIPLE},
-                                {"sigma_share", sigma_share},
-                                {"rho_share", rho_share}};
-  send_to_proxy_hub(sock, exchange_triple_share.dump(2));
-
-  // 片方のサーバーからsigmaとrhoのシェアを受信し復元
-  ret = sock.recv(content_msg, zmq::recv_flags::none);
-  if (!ret) {
-    std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
-              << std::endl;
-    exit(1);
-  }
-  content = content_msg.to_string();
-  std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
-  received_json = json::parse(content);
-  if (received_json["type"] != EXCHANGE_TRIPLE)
-    exit(1);
-  NumType received_sigma_share = received_json["sigma_share"];
-  NumType received_rho_share = received_json["rho_share"];
-  NumType sigma =
-      BT::reconstruct_from_shares({sigma_share, received_sigma_share});
-  NumType rho = BT::reconstruct_from_shares({rho_share, received_rho_share});
-
-  // 掛け算を実行
-  NumType product_share =
-      rho * triple_a_share + sigma * triple_b_share + triple_c_share;
-  if (MY_SERVER == SERVER_1)
-    product_share += sigma * rho;
-
-  return product_share;
+NumType exec_multiplication(ShareType share1, ShareType share2) {
+  return std::get<0>(share1) * std::get<0>(share2) +
+         std::get<0>(share1) * std::get<1>(share2) +
+         std::get<1>(share1) * std::get<0>(share2);
 }
 
 void exec_select(zmq::socket_t &sock, json received_json) {
-  std::vector<NumType> search_vector_share = received_json["value"];
+  SharesType search_vector_share = received_json["value"].get<SharesType>();
   NumType calculated_result = 0LL;
-  int db_size = table.size();
+  int db_size = table_share_1.size();
 
   // 内積を計算
   for (int id_i = 0; id_i < db_size; id_i++) {
-    calculated_result +=
-        exec_multiplication(sock, table[id_i], search_vector_share[id_i]);
-    if (id_i % 2 == 0)
-      // オーバーフロー防止
-      calculated_result = mod(calculated_result, MODULUS);
+    calculated_result += exec_multiplication(
+        {table_share_1[id_i], table_share_2[id_i]}, search_vector_share[id_i]);
   }
 
   // 結果を送信
@@ -166,18 +126,18 @@ int main(int argc, char *argv[]) {
   }
   if (strcmp(argv[1], "1") == 0) {
     MY_SERVER = SERVER_1;
-    SERVER_TO_SEND_SHARE = SERVER_3;
-    SERVER_TO_RECEIVE_SHARE = SERVER_2;
+    SERVER_TO_SEND_SHARE = SERVER_2;
+    SERVER_TO_RECEIVE_SHARE = SERVER_3;
     DB_FILE = DB_FILE_1;
   } else if (strcmp(argv[1], "2") == 0) {
     MY_SERVER = SERVER_2;
-    SERVER_TO_SEND_SHARE = SERVER_1;
-    SERVER_TO_RECEIVE_SHARE = SERVER_3;
+    SERVER_TO_SEND_SHARE = SERVER_3;
+    SERVER_TO_RECEIVE_SHARE = SERVER_1;
     DB_FILE = DB_FILE_2;
   } else {
     MY_SERVER = SERVER_3;
-    SERVER_TO_SEND_SHARE = SERVER_2;
-    SERVER_TO_RECEIVE_SHARE = SERVER_1;
+    SERVER_TO_SEND_SHARE = SERVER_1;
+    SERVER_TO_RECEIVE_SHARE = SERVER_2;
     DB_FILE = DB_FILE_3;
   }
 
@@ -191,21 +151,10 @@ int main(int argc, char *argv[]) {
 
   while (true) {
     std::cout << "Waiting for a query...\n";
-    zmq::message_t content_msg;
-    auto ret = sock.recv(content_msg, zmq::recv_flags::none);
-    if (!ret) {
-      std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
-                << std::endl;
-      continue;
-    }
-
-    std::string content = content_msg.to_string();
-    std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
-
-    auto received_json = json::parse(content);
+    auto received_json = receive_json(sock);
 
     if (received_json["type"] == QUERY_INSERT) {
-      exec_insert(received_json);
+      exec_insert(sock, received_json);
 
     } else if (received_json["type"] == QUERY_SELECT) {
       exec_select(sock, received_json);

@@ -26,17 +26,18 @@ void send_query_insert(zmq::socket_t &sock) {
   json json_to_send_server_1 = {{"from", CLIENT},
                                 {"to", SERVER_1},
                                 {"type", QUERY_INSERT},
-                                {"value", value_shares[0]}};
+                                {"value", std::get<0>(value_shares[0])}};
   json json_to_send_server_2 = {{"from", CLIENT},
                                 {"to", SERVER_2},
                                 {"type", QUERY_INSERT},
-                                {"value", value_shares[1]}};
+                                {"value", std::get<0>(value_shares[1])}};
   json json_to_send_server_3 = {{"from", CLIENT},
                                 {"to", SERVER_3},
                                 {"type", QUERY_INSERT},
-                                {"value", value_shares[2]}};
+                                {"value", std::get<0>(value_shares[2])}};
   send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
   send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
+  send_to_proxy_hub(sock, json_to_send_server_3.dump(2));
 }
 
 void send_query_select(zmq::socket_t &sock) {
@@ -63,15 +64,16 @@ void send_query_select(zmq::socket_t &sock) {
   search_vector[id_to_select] = 1;
 
   // 検索ベクトルを分散
-  std::vector<NumType> search_vector_share_1(db_size),
-      search_vector_share_2(db_size);
+  SharesType search_vector_share_1(db_size), search_vector_share_2(db_size),
+      search_vector_share_3(db_size);
   for (int id_i = 0; id_i < db_size; id_i++) {
-    SharesType id_i_shares = BT::create_shares(search_vector[id_i]);
+    SharesType id_i_shares = Replicated::create_shares(search_vector[id_i]);
     search_vector_share_1[id_i] = id_i_shares[0];
     search_vector_share_2[id_i] = id_i_shares[1];
+    search_vector_share_3[id_i] = id_i_shares[2];
   }
 
-  // 検索ベクトルのシェアを送信
+  // DBサーバーに検索ベクトルのシェアを送信
   json json_to_send_server_1 = {{"from", CLIENT},
                                 {"to", SERVER_1},
                                 {"type", QUERY_SELECT},
@@ -80,43 +82,46 @@ void send_query_select(zmq::socket_t &sock) {
                                 {"to", SERVER_2},
                                 {"type", QUERY_SELECT},
                                 {"value", search_vector_share_2}};
+  json json_to_send_server_3 = {{"from", CLIENT},
+                                {"to", SERVER_3},
+                                {"type", QUERY_SELECT},
+                                {"value", search_vector_share_3}};
   send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
   send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
+  send_to_proxy_hub(sock, json_to_send_server_3.dump(2));
 
   // 両サーバーから応答が返ってくるまで待機
   std::cout << "Waiting for response..." << std::endl;
-  zmq::message_t content_msg;
   bool is_received_from_server_1 = false;
   bool is_received_from_server_2 = false;
-  json json_from_server_1, json_from_server_2;
-  while (!is_received_from_server_1 || !is_received_from_server_2) {
-    auto ret = sock.recv(content_msg, zmq::recv_flags::none);
-    if (!ret) {
-      std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
-                << std::endl;
-      return;
-    }
-
-    std::string content = content_msg.to_string();
-    std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
-    auto received_json = json::parse(content);
+  bool is_received_from_server_3 = false;
+  json json_from_server_1, json_from_server_2, json_from_server_3;
+  while (!is_received_from_server_1 || !is_received_from_server_2 ||
+         !is_received_from_server_3) {
+    auto received_json = receive_json(sock);
     if (received_json["from"] == SERVER_1) {
       is_received_from_server_1 = true;
       json_from_server_1 = received_json;
     } else if (received_json["from"] == SERVER_2) {
       is_received_from_server_2 = true;
       json_from_server_2 = received_json;
+    } else {
+      is_received_from_server_3 = true;
+      json_from_server_3 = received_json;
     }
   }
 
   // 復元して値を取得
   NumType value_from_server_1 = json_from_server_1["value"];
   NumType value_from_server_2 = json_from_server_2["value"];
-  std::cout << "Reconstruct from " << value_from_server_1 << " and "
-            << value_from_server_2 << "." << std::endl;
-  std::vector<NumType> result_table = {
-      BT::reconstruct_from_shares({value_from_server_1, value_from_server_2})};
-  print_table(result_table, 1, false, id_to_select);
+  NumType value_from_server_3 = json_from_server_3["value"];
+  std::cout << "Reconstruct from " << value_from_server_1 << ", "
+            << value_from_server_2 << " and " << value_from_server_3 << "."
+            << std::endl;
+  NumType result_value = Replicated::reconstruct_from_shares(
+      {value_from_server_1, value_from_server_2},
+      {value_from_server_2, value_from_server_3});
+  Replicated::print_id_value_as_table(id_to_select, result_value);
 
   // 計測終了
   auto end_time = std::chrono::high_resolution_clock::now();
