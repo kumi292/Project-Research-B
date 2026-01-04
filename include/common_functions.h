@@ -4,7 +4,6 @@
 #include "zmq.hpp"
 #include <string>
 
-const std::string PORT = "10000";
 const std::string CLIENT = "CLIENT";
 const std::string SERVER_1 = "SERVER 1";
 const std::string SERVER_2 = "SERVER 2";

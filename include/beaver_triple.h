@@ -13,6 +13,7 @@ constexpr NumType TRIPLE_MAX = 1LL << 13;
 const std::string DB_FILE_1 = "src/additive_communication/db_server_1.json";
 const std::string DB_FILE_2 = "src/additive_communication/db_server_2.json";
 const std::string SEND_TRIPLE = "SEND TRIPLE";
+const std::string PORT = "10000";
 
 namespace BT {
 
