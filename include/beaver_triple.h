@@ -14,9 +14,6 @@ const std::string DB_FILE_1 = "src/additive_communication/db_server_1.json";
 const std::string DB_FILE_2 = "src/additive_communication/db_server_2.json";
 const std::string SEND_TRIPLE = "SEND TRIPLE";
 
-void print_table(std::vector<NumType> &table, int limit, bool reverse = false,
-                 int id = -1);
-
 namespace BT {
 
 inline int communication_cost = 0;
@@ -26,5 +23,7 @@ SharesType add(std::vector<SharesType> parties_with_shares);
 SharesType multiply(std::vector<SharesType> parties_with_shares);
 SharesType inner_product(std::vector<SharesType> party1_shares,
                          std::vector<SharesType> party2_shares);
+void print_all_table(std::vector<NumType> &table, int limit, bool tail = false);
+void print_id_value_as_table(int id, NumType value);
 
 } // namespace BT

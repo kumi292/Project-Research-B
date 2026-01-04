@@ -33,7 +33,7 @@ void load_table() {
   i_file >> table_json;
   if (table_json["size"] != 0) {
     table_json["records"].get_to(table);
-    print_table(table, 10);
+    BT::print_all_table(table, 10);
   } else {
     std::cout << "No records in the table." << std::endl;
   }
@@ -48,7 +48,7 @@ void save_table() {
   std::ofstream o_file(DB_FILE);
   o_file << table_json_to_save.dump(2);
   o_file.close();
-  print_table(table, 10, true);
+  BT::print_all_table(table, 10, true);
 }
 
 void truncate_table() {

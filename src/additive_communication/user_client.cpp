@@ -100,9 +100,9 @@ void send_query_select(zmq::socket_t &sock) {
   NumType value_from_server_2 = json_from_server_2["value"];
   std::cout << "Reconstruct from " << value_from_server_1 << " and "
             << value_from_server_2 << "." << std::endl;
-  std::vector<NumType> result_table = {
-      BT::reconstruct_from_shares({value_from_server_1, value_from_server_2})};
-  print_table(result_table, 1, false, id_to_select);
+  NumType result_value =
+      BT::reconstruct_from_shares({value_from_server_1, value_from_server_2});
+  BT::print_id_value_as_table(id_to_select, result_value);
 
   // 計測終了
   auto end_time = std::chrono::high_resolution_clock::now();
