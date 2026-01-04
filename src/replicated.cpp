@@ -11,6 +11,11 @@
 
 namespace Replicated {
 
+std::string create_string_expression(ShareType share) {
+  return "(" + std::to_string(std::get<0>(share)) + ", " +
+         std::to_string(std::get<1>(share)) + ")";
+}
+
 SharesType create_shares(NumType plain_num) {
   if (plain_num >= MODULUS)
     throw std::invalid_argument(
