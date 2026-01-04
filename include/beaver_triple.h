@@ -14,6 +14,9 @@ const std::string DB_FILE_1 = "src/additive_communication/db_server_1.json";
 const std::string DB_FILE_2 = "src/additive_communication/db_server_2.json";
 const std::string SEND_TRIPLE = "SEND TRIPLE";
 
+void print_table(std::vector<NumType> &table, int limit, bool reverse = false,
+                 int id = -1);
+
 namespace BT {
 
 inline int communication_cost = 0;
