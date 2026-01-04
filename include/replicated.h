@@ -15,6 +15,7 @@ constexpr NumType RANDOM_MAX = 1LL << 29;
 const std::string DB_FILE_1 = "src/replicated_communication/db_server_1.json";
 const std::string DB_FILE_2 = "src/replicated_communication/db_server_2.json";
 const std::string DB_FILE_3 = "src/replicated_communication/db_server_3.json";
+const std::string SEND_SHARE = "SEND SHARE";
 
 namespace Replicated {
 
