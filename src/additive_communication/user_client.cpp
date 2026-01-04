@@ -8,14 +8,6 @@
 #include "beaver_triple.h"
 #include "common_functions.h"
 
-using json = nlohmann::json;
-
-void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
-  zmq::message_t content_msg(content);
-  sock.send(content_msg, zmq::send_flags::none);
-  std::cout << BLUE << "Sent: \n" << NO_COLOR << content << std::endl;
-}
-
 int retrieve_db_size() {
   std::ifstream i_file(DB_FILE_1);
   json table_json;
@@ -89,21 +81,11 @@ void send_query_select(zmq::socket_t &sock) {
 
   // 両サーバーから応答が返ってくるまで待機
   std::cout << "Waiting for response..." << std::endl;
-  zmq::message_t content_msg;
   bool is_received_from_server_1 = false;
   bool is_received_from_server_2 = false;
   json json_from_server_1, json_from_server_2;
   while (!is_received_from_server_1 || !is_received_from_server_2) {
-    auto ret = sock.recv(content_msg, zmq::recv_flags::none);
-    if (!ret) {
-      std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
-                << std::endl;
-      return;
-    }
-
-    std::string content = content_msg.to_string();
-    std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
-    auto received_json = json::parse(content);
+    auto received_json = receive_json(sock);
     if (received_json["from"] == SERVER_1) {
       is_received_from_server_1 = true;
       json_from_server_1 = received_json;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "json.hpp"
+#include "zmq.hpp"
 #include <string>
 #include <vector>
 
@@ -24,6 +26,9 @@ const std::string NO_COLOR = "\033[m";
 const int LATENCY_MILS = 30;
 
 using NumType = long long;
+using json = nlohmann::json;
+
 NumType mod(NumType dividend, NumType divisor);
-void print_table(std::vector<NumType> &table, int limit, bool reverse = false,
-                 int id = -1);
+void send_msg(zmq::socket_t &router, std::string destination, std::string body);
+void send_to_proxy_hub(zmq::socket_t &sock, std::string content);
+json receive_json(zmq::socket_t &sock);

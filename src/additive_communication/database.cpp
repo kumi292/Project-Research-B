@@ -10,17 +10,10 @@
 #include "beaver_triple.h"
 #include "common_functions.h"
 
-using json = nlohmann::json;
 std::string MY_SERVER;
 std::string OTHER_SERVER;
 std::string DB_FILE;
 std::vector<NumType> table;
-
-void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
-  zmq::message_t content_msg(content);
-  sock.send(content_msg, zmq::send_flags::none);
-  std::cout << BLUE << "Sent: \n" << NO_COLOR << content << std::endl;
-}
 
 void init_table() {
   table = {};
@@ -78,16 +71,7 @@ NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
     json request_for_beaver_triple = {{"type", SEND_TRIPLE}};
     send_to_proxy_hub(sock, request_for_beaver_triple.dump(2));
   }
-  zmq::message_t content_msg;
-  auto ret = sock.recv(content_msg, zmq::recv_flags::none);
-  if (!ret) {
-    std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
-              << std::endl;
-    exit(1);
-  }
-  std::string content = content_msg.to_string();
-  std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
-  auto received_json = json::parse(content);
+  json received_json = receive_json(sock);
   if (received_json["type"] != SEND_TRIPLE)
     exit(1);
   NumType triple_a_share = received_json["triple_a_share"];
@@ -105,15 +89,7 @@ NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
   send_to_proxy_hub(sock, exchange_triple_share.dump(2));
 
   // 片方のサーバーからsigmaとrhoのシェアを受信し復元
-  ret = sock.recv(content_msg, zmq::recv_flags::none);
-  if (!ret) {
-    std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
-              << std::endl;
-    exit(1);
-  }
-  content = content_msg.to_string();
-  std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
-  received_json = json::parse(content);
+  received_json = receive_json(sock);
   if (received_json["type"] != EXCHANGE_TRIPLE)
     exit(1);
   NumType received_sigma_share = received_json["sigma_share"];
@@ -183,18 +159,7 @@ int main(int argc, char *argv[]) {
 
   while (true) {
     std::cout << "Waiting for a query...\n";
-    zmq::message_t content_msg;
-    auto ret = sock.recv(content_msg, zmq::recv_flags::none);
-    if (!ret) {
-      std::cout << RED << "ERROR, Can't Receive Message Correctly." << NO_COLOR
-                << std::endl;
-      continue;
-    }
-
-    std::string content = content_msg.to_string();
-    std::cout << GREEN << "Received: \n" << NO_COLOR << content << std::endl;
-
-    auto received_json = json::parse(content);
+    auto received_json = receive_json(sock);
 
     if (received_json["type"] == QUERY_INSERT) {
       exec_insert(received_json);
