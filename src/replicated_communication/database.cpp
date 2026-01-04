@@ -14,11 +14,14 @@ std::string MY_SERVER;
 std::string SERVER_TO_SEND_SHARE;
 std::string SERVER_TO_RECEIVE_SHARE;
 std::string DB_FILE;
-std::vector<NumType> table;
+std::vector<NumType> table_share_1;
+std::vector<NumType> table_share_2;
 
 void init_table() {
-  table = {};
-  json init_table_json = {{"size", 0}, {"records", {}}};
+  table_share_1 = {};
+  table_share_2 = {};
+  json init_table_json = {{"size", 0},
+                          {"records", {{"share1", {}}, {"share2", {}}}}};
   std::ofstream o_file(DB_FILE);
   o_file << init_table_json.dump(2);
   o_file.close();
@@ -33,8 +36,9 @@ void load_table() {
   json table_json;
   i_file >> table_json;
   if (table_json["size"] != 0) {
-    table_json["records"].get_to(table);
-    print_table(table, 10);
+    table_json["records"]["share1"].get_to(table_share_1);
+    table_json["records"]["share2"].get_to(table_share_2);
+    Replicated::print_all_table(table_share_1, table_share_2, 10);
   } else {
     std::cout << "No records in the table." << std::endl;
   }
@@ -43,13 +47,14 @@ void load_table() {
 
 void save_table() {
   json table_json_to_save;
-  table_json_to_save["size"] = table.size();
-  table_json_to_save["records"] = table;
+  table_json_to_save["size"] = table_share_1.size();
+  table_json_to_save["records"]["share1"] = table_share_1;
+  table_json_to_save["records"]["share2"] = table_share_2;
 
   std::ofstream o_file(DB_FILE);
   o_file << table_json_to_save.dump(2);
   o_file.close();
-  print_table(table, 10, true);
+  Replicated::print_all_table(table_share_1, table_share_2, 10, true);
 }
 
 void truncate_table() {
