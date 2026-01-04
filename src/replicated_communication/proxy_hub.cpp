@@ -4,6 +4,7 @@
 #include <string>
 
 #include "common_functions.h"
+#include "replicated.h"
 
 int main() {
   zmq::context_t ctx(1);
