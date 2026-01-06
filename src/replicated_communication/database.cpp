@@ -102,6 +102,9 @@ void exec_select(zmq::socket_t &sock, json received_json) {
   for (int id_i = 0; id_i < db_size; id_i++) {
     calculated_result += exec_multiplication(
         {table_share_1[id_i], table_share_2[id_i]}, search_vector_share[id_i]);
+    if (id_i % 2 == 0)
+      // オーバーフロー防止
+      calculated_result = mod(calculated_result, MODULUS);
   }
 
   // 結果を送信
