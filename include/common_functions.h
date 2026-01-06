@@ -28,5 +28,6 @@ using json = nlohmann::json;
 
 NumType mod(NumType dividend, NumType divisor);
 void send_msg(zmq::socket_t &router, std::string destination, std::string body);
+json receive_json_in_proxy_hub(zmq::socket_t &router);
 void send_to_proxy_hub(zmq::socket_t &sock, std::string content);
 json receive_json(zmq::socket_t &sock);

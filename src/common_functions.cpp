@@ -25,6 +25,27 @@ void send_msg(zmq::socket_t &router, std::string destination,
   router.send(body_msg, zmq::send_flags::none);
 }
 
+json receive_json_in_proxy_hub(zmq::socket_t &router) {
+  zmq::message_t sender_msg;
+  zmq::message_t content_msg;
+  auto ret = router.recv(sender_msg, zmq::recv_flags::none);
+  ret = router.recv(content_msg, zmq::recv_flags::none);
+  if (!ret) {
+    std::cout << "[LOG] " << RED << "ERROR, Can't Receive Message Correctly."
+              << NO_COLOR << std::endl;
+    exit(1);
+  }
+
+  std::string sender = sender_msg.to_string();
+  std::string content = content_msg.to_string();
+  std::cout << "[LOG] " << GREEN << "From: " << NO_COLOR << sender << NO_COLOR
+            << std::endl;
+  std::cout << "[LOG] " << GREEN << "Received: \n"
+            << NO_COLOR << content << std::endl;
+
+  return json::parse(content);
+}
+
 void send_to_proxy_hub(zmq::socket_t &sock, std::string content) {
   zmq::message_t content_msg(content);
   sock.send(content_msg, zmq::send_flags::none);

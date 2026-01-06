@@ -14,24 +14,7 @@ int main() {
   std::cout << "Listening on tcp://*:" + PORT + "..." << std::endl;
 
   while (true) {
-    zmq::message_t sender_msg;
-    zmq::message_t content_msg;
-    auto ret = router.recv(sender_msg, zmq::recv_flags::none);
-    ret = router.recv(content_msg, zmq::recv_flags::none);
-    if (!ret) {
-      std::cout << "[LOG] " << RED << "ERROR, Can't Receive Message Correctly."
-                << NO_COLOR << std::endl;
-      continue;
-    }
-
-    std::string sender = sender_msg.to_string();
-    std::string content = content_msg.to_string();
-    std::cout << "[LOG] " << GREEN << "From: " << NO_COLOR << sender << NO_COLOR
-              << std::endl;
-    std::cout << "[LOG] " << GREEN << "Received: \n"
-              << NO_COLOR << content << std::endl;
-
-    auto received_json = json::parse(content);
+    auto received_json = receive_json_in_proxy_hub(router);
 
     if (received_json["type"] == SHUT_DOWN ||
         received_json["type"] == QUERY_TRUNCATE) {
@@ -45,7 +28,7 @@ int main() {
       }
     } else {
       std::string destination = received_json["to"];
-      send_msg(router, destination, content);
+      send_msg(router, destination, received_json.dump(2));
       std::cout << "----> " << BLUE << "Sent to: " << NO_COLOR << destination
                 << std::endl;
     }
