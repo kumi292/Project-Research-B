@@ -16,13 +16,8 @@ int retrieve_db_size() {
   return table_json["size"];
 }
 
-void send_query_insert(zmq::socket_t &sock) {
-  int db_size = retrieve_db_size();
-  std::cout << "Enter value to insert (next id: " << db_size << "): ";
-  NumType value_to_insert;
-  std::cin >> value_to_insert;
-
-  SharesType value_shares = Replicated::create_shares(value_to_insert);
+void send_query_insert_value(zmq::socket_t &sock, NumType value) {
+  SharesType value_shares = Replicated::create_shares(value);
   json json_to_send_server_1 = {{"from", CLIENT},
                                 {"to", SERVER_1},
                                 {"type", QUERY_INSERT},
@@ -38,6 +33,14 @@ void send_query_insert(zmq::socket_t &sock) {
   send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
   send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
   send_to_proxy_hub(sock, json_to_send_server_3.dump(2));
+}
+
+void send_query_insert(zmq::socket_t &sock) {
+  int db_size = retrieve_db_size();
+  std::cout << "Enter value to insert (next id: " << db_size << "): ";
+  NumType value_to_insert;
+  std::cin >> value_to_insert;
+  send_query_insert_value(sock, value_to_insert);
 }
 
 void send_query_select(zmq::socket_t &sock) {
@@ -153,7 +156,8 @@ int main() {
 
   while (true) {
     std::cout << "Which query to execute\n";
-    std::cout << "1. INSERT\n2. SELECT\n3. TRUNCATE\n4. QUIT\n";
+    std::cout << "1. INSERT\n2. SELECT\n3. TRUNCATE\n4. QUIT\n5. Auto-INSERT N "
+                 "records\n";
     std::cout << "Enter number: ";
     std::cin >> inputted_str;
 
@@ -170,6 +174,15 @@ int main() {
       std::cout << "The program will be finished.\n";
       send_request_to_shut_down(sock);
       break;
+
+    } else if (inputted_str == "5") {
+      send_query_truncate(sock);
+      std::cout << "Enter the number of records: ";
+      int num;
+      std::cin >> num;
+      for (int i = 0; i < num; i++) {
+        send_query_insert_value(sock, 10000 + i);
+      }
 
     } else {
       std::cout << "Sorry, try again.\n";
