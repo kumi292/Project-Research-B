@@ -1,2 +1,5 @@
 bin/*
 !bin/.gitkeep
+db_server_1.json
+db_server_2.json
+db_server_3.json

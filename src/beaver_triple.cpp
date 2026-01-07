@@ -1,5 +1,6 @@
 #include "beaver_triple.h"
 
+#include <iostream>
 #include <random>
 #include <stdexcept>
 #include <vector>
@@ -110,6 +111,28 @@ SharesType inner_product(std::vector<SharesType> party1_shares,
   }
 
   return calculated_shares;
+}
+
+void print_all_table(std::vector<NumType> &table, int limit, bool tail) {
+  const int db_size = table.size();
+  int id_i = tail && db_size - limit >= 0 ? db_size - limit : 0;
+  std::printf("+--------+--------------+\n");
+  std::printf("|%3sid%3s|%5sdata%5s|\n", "", "", "", "");
+  std::printf("+--------+--------------+\n");
+  for (int print_count = 0; id_i < db_size && print_count < limit;
+       id_i++, print_count++) {
+    std::printf("|%5d%3s|%12lld%2s|\n", id_i, "", table[id_i], "");
+  }
+  std::printf("+--------+--------------+\n");
+  std::cout << "(total " << db_size << " records)" << std::endl;
+}
+
+void print_id_value_as_table(int id, NumType value) {
+  std::printf("+--------+--------------+\n");
+  std::printf("|%3sid%3s|%5sdata%5s|\n", "", "", "", "");
+  std::printf("+--------+--------------+\n");
+  std::printf("|%5d%3s|%12lld%2s|\n", id, "", value, "");
+  std::printf("+--------+--------------+\n");
 }
 
 } // namespace BT
