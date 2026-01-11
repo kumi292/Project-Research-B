@@ -110,7 +110,7 @@ void exec_select(zmq::socket_t &sock, json received_json) {
   // 結果を送信
   json result_value_json = {{"from", MY_SERVER},
                             {"to", CLIENT},
-                            {"type", RETURN_VALUE},
+                            {"type", QUERY_COMPLETED},
                             {"value", calculated_result}};
   send_to_proxy_hub(sock, result_value_json.dump(2));
 

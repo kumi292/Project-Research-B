@@ -56,12 +56,15 @@ void truncate_table() {
   init_table();
 }
 
-void exec_insert(json received_json) {
+void exec_insert(zmq::socket_t &sock, json received_json) {
   NumType value = received_json["value"];
   std::cout << YELLOW << "INSERT " << NO_COLOR << "value: " << value
             << std::endl;
   table.push_back(value);
   save_table();
+  json json_to_client = {
+      {"from", MY_SERVER}, {"to", CLIENT}, {"type", QUERY_COMPLETED}};
+  send_to_proxy_hub(sock, json_to_client.dump(2));
 }
 
 NumType exec_multiplication(zmq::socket_t &sock, NumType share_1,
@@ -124,7 +127,7 @@ void exec_select(zmq::socket_t &sock, json received_json) {
   // 結果を送信
   json result_value_json = {{"from", MY_SERVER},
                             {"to", CLIENT},
-                            {"type", RETURN_VALUE},
+                            {"type", QUERY_COMPLETED},
                             {"value", calculated_result}};
   send_to_proxy_hub(sock, result_value_json.dump(2));
 
@@ -162,7 +165,7 @@ int main(int argc, char *argv[]) {
     auto received_json = receive_json(sock);
 
     if (received_json["type"] == QUERY_INSERT) {
-      exec_insert(received_json);
+      exec_insert(sock, received_json);
 
     } else if (received_json["type"] == QUERY_SELECT) {
       exec_select(sock, received_json);

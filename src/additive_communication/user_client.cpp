@@ -28,6 +28,17 @@ void send_query_insert_value(zmq::socket_t &sock, NumType value) {
                                 {"value", value_shares[1]}};
   send_to_proxy_hub(sock, json_to_send_server_1.dump(2));
   send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
+  bool is_received_from_server_1 = false;
+  bool is_received_from_server_2 = false;
+  json json_from_server_1, json_from_server_2;
+  while (!is_received_from_server_1 || !is_received_from_server_2) {
+    auto received_json = receive_json(sock);
+    if (received_json["from"] == SERVER_1) {
+      is_received_from_server_1 = true;
+    } else if (received_json["from"] == SERVER_2) {
+      is_received_from_server_2 = true;
+    }
+  }
 }
 
 void send_query_insert(zmq::socket_t &sock) {
@@ -35,7 +46,15 @@ void send_query_insert(zmq::socket_t &sock) {
   std::cout << "Enter value to insert (next id: " << db_size << "): ";
   NumType value_to_insert;
   std::cin >> value_to_insert;
+  auto start_time = std::chrono::high_resolution_clock::now();
   send_query_insert_value(sock, value_to_insert);
+  auto end_time = std::chrono::high_resolution_clock::now();
+  auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                         end_time - start_time)
+                         .count();
+  std::cout << std::endl;
+  std::cout << "[Ended in " << YELLOW << duration_ms / 1000.0 << NO_COLOR
+            << " second]" << std::endl;
 }
 
 void send_query_select(zmq::socket_t &sock) {
@@ -161,9 +180,18 @@ int main() {
       std::cout << "Enter the number of records: ";
       int num;
       std::cin >> num;
+      auto start_time = std::chrono::high_resolution_clock::now();
       for (int i = 0; i < num; i++) {
         send_query_insert_value(sock, 10000 + i);
       }
+      auto end_time = std::chrono::high_resolution_clock::now();
+      auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                             end_time - start_time)
+                             .count();
+      std::cout << std::endl;
+      std::cout << "Completed INSERT " << num << " records" << std::endl;
+      std::cout << "[Ended in " << YELLOW << duration_ms / 1000.0 << NO_COLOR
+                << " second]" << std::endl;
 
     } else {
       std::cout << "Sorry, try again.\n";
