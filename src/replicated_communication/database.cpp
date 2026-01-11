@@ -85,6 +85,10 @@ void exec_insert(zmq::socket_t &sock, json received_json) {
   table_share_1.push_back(share);
   table_share_2.push_back(share_from_another_server);
   save_table();
+
+  json json_to_client = {
+      {"from", MY_SERVER}, {"to", CLIENT}, {"type", QUERY_COMPLETED}};
+  send_to_proxy_hub(sock, json_to_client.dump(2));
 }
 
 NumType exec_multiplication(ShareType share1, ShareType share2) {
