@@ -30,7 +30,6 @@ void send_query_insert_value(zmq::socket_t &sock, NumType value) {
   send_to_proxy_hub(sock, json_to_send_server_2.dump(2));
   bool is_received_from_server_1 = false;
   bool is_received_from_server_2 = false;
-  json json_from_server_1, json_from_server_2;
   while (!is_received_from_server_1 || !is_received_from_server_2) {
     auto received_json = receive_json(sock);
     if (received_json["from"] == SERVER_1) {
