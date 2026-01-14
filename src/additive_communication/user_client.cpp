@@ -45,9 +45,9 @@ void send_query_insert(zmq::socket_t &sock) {
   std::cout << "Enter value to insert (next id: " << db_size << "): ";
   NumType value_to_insert;
   std::cin >> value_to_insert;
-  auto start_time = std::chrono::high_resolution_clock::now();
+  auto start_time = std::chrono::steady_clock::now();
   send_query_insert_value(sock, value_to_insert);
-  auto end_time = std::chrono::high_resolution_clock::now();
+  auto end_time = std::chrono::steady_clock::now();
   auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                          end_time - start_time)
                          .count();
@@ -70,7 +70,7 @@ void send_query_select(zmq::socket_t &sock) {
   std::cin >> id_to_select;
 
   // 計測開始
-  auto start_time = std::chrono::high_resolution_clock::now();
+  auto start_time = std::chrono::steady_clock::now();
   if (id_to_select > db_size - 1 || id_to_select < 0) {
     std::cout << RED << "ERROR, inputted number is invalid." << NO_COLOR
               << std::endl;
@@ -126,7 +126,7 @@ void send_query_select(zmq::socket_t &sock) {
   BT::print_id_value_as_table(id_to_select, result_value);
 
   // 計測終了
-  auto end_time = std::chrono::high_resolution_clock::now();
+  auto end_time = std::chrono::steady_clock::now();
   auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                          end_time - start_time)
                          .count();
@@ -179,11 +179,11 @@ int main() {
       std::cout << "Enter the number of records: ";
       int num;
       std::cin >> num;
-      auto start_time = std::chrono::high_resolution_clock::now();
+      auto start_time = std::chrono::steady_clock::now();
       for (int i = 0; i < num; i++) {
         send_query_insert_value(sock, 10000 + i);
       }
-      auto end_time = std::chrono::high_resolution_clock::now();
+      auto end_time = std::chrono::steady_clock::now();
       auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                              end_time - start_time)
                              .count();
