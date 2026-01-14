@@ -1,11 +1,17 @@
 #include "common_functions.h"
 
 #include "zmq.hpp"
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <iostream>
+#include <random>
 #include <stdexcept>
 #include <thread>
+
+std::random_device rd;
+std::mt19937 gen(rd());
+std::normal_distribution<> dist(30.0, 7.0);
 
 NumType mod(NumType dividend, NumType divisor) {
   if (divisor <= 0)
@@ -14,13 +20,15 @@ NumType mod(NumType dividend, NumType divisor) {
                        : (dividend % divisor + divisor) % divisor;
 }
 
+int generate_latency_ms() { return std::max(1, static_cast<int>(dist(gen))); }
+
 void send_msg(zmq::socket_t &router, std::string destination,
               std::string body) {
   zmq::message_t dest_msg(destination);
   zmq::message_t body_msg(body);
 
   // 通信が発生するたびに遅延を入れる
-  std::this_thread::sleep_for(std::chrono::milliseconds(LATENCY_MILS));
+  std::this_thread::sleep_for(std::chrono::milliseconds(generate_latency_ms()));
   router.send(dest_msg, zmq::send_flags::sndmore);
   router.send(body_msg, zmq::send_flags::none);
 }

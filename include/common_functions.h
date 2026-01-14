@@ -21,12 +21,11 @@ const std::string YELLOW = "\033[33m";
 const std::string BLUE = "\033[36m";
 const std::string NO_COLOR = "\033[m";
 
-const int LATENCY_MILS = 10;
-
 using NumType = long long;
 using json = nlohmann::json;
 
 NumType mod(NumType dividend, NumType divisor);
+int generete_latency_ms();
 void send_msg(zmq::socket_t &router, std::string destination, std::string body);
 json receive_json_in_proxy_hub(zmq::socket_t &router);
 void send_to_proxy_hub(zmq::socket_t &sock, std::string content);
